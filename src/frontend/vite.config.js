@@ -18,6 +18,10 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: false,
     minify: false,
+    // Inline ALL assets as base64 data URIs directly in the JS bundle.
+    // This guarantees images survive deployment regardless of how the
+    // platform handles separate static asset files.
+    assetsInlineLimit: 100 * 1024 * 1024,
   },
   css: {
     postcss: "./postcss.config.js",

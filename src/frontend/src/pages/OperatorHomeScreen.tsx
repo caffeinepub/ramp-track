@@ -1,7 +1,7 @@
-import checkInIcon1 from "../assets/Check_In_Icon-1.png";
-import checkOutIcon1 from "../assets/Check_Out_Icon-1.png";
+import checkInIcon from "../assets/Check_In_Icon-1.png";
+import checkOutIcon from "../assets/Check_Out_Icon-1.png";
 import homescreenBackground from "../assets/HomescreenBackground.jpg";
-import reportIssueIcon1 from "../assets/Report_Issue_Icon-1.png";
+import reportIssueIcon from "../assets/Report_Issue_Icon-1.png";
 
 export default function OperatorHomeScreen({
   onCheckOut,
@@ -65,7 +65,7 @@ export default function OperatorHomeScreen({
               aria-label="Take Equipment"
             >
               <img
-                src={checkOutIcon1}
+                src={checkOutIcon}
                 alt="Take Equipment"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
@@ -78,7 +78,7 @@ export default function OperatorHomeScreen({
               aria-label="Return Equipment"
             >
               <img
-                src={checkInIcon1}
+                src={checkInIcon}
                 alt="Return Equipment"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
@@ -91,7 +91,7 @@ export default function OperatorHomeScreen({
               aria-label="Report Issue"
             >
               <img
-                src={reportIssueIcon1}
+                src={reportIssueIcon}
                 alt="Report Issue"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />

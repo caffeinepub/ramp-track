@@ -12,7 +12,9 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function SignInScreen() {
+export default function SignInScreen({
+  onLoginSuccess,
+}: { onLoginSuccess?: (roles: string[]) => void }) {
   const { login, auth } = useAuth();
   const [loginMode, setLoginMode] = useState<"operator" | "admin">("operator");
   const [email, setEmail] = useState("");
@@ -29,8 +31,24 @@ export default function SignInScreen() {
     setError("");
     try {
       await login({ username: email, password, badge: email });
-    } catch (err: any) {
-      setError(err.message || "Login failed.");
+      // Find the roles for the logged-in user
+      const USERS = [
+        {
+          username: "operator@demo.com",
+          password: "test123",
+          roles: ["agent"],
+        },
+        { username: "970251", password: "test123", roles: ["admin", "agent"] },
+        { username: "100001", password: "test123", roles: ["agent"] },
+      ];
+      const user = USERS.find(
+        (u) => u.username === email && u.password === password,
+      );
+      if (onLoginSuccess && user) {
+        onLoginSuccess(user.roles);
+      }
+    } catch (err: unknown) {
+      setError((err as Error).message || "Login failed.");
       setIsLoggingIn(false);
     }
   };

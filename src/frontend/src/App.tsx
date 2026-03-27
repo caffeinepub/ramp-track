@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
-import OfflineIndicator from "./components/OfflineIndicator";
 import SignOnScreen from "./components/SignOnScreen";
 import SplashScreen from "./components/SplashScreen";
-import { Toaster } from "./components/ui/sonner";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import AdminMenuScreen from "./pages/AdminMenuScreen";
 import CheckInScreen from "./pages/CheckInScreen";
@@ -14,131 +12,164 @@ import OperatorHomeScreen from "./pages/OperatorHomeScreen";
 import ReportIssueScreen from "./pages/ReportIssueScreen";
 import SignInScreen from "./pages/SignInScreen";
 
-type Screen =
-  | "home"
+type View =
+  | "splash"
+  | "signin"
+  | "signon"
+  | "operator-home"
   | "checkout"
   | "checkin"
-  | "reportIssue"
-  | "adminMenu"
-  | "manageEquipment"
-  | "equipmentDetail";
-type UserRole = "agent" | "admin" | null;
+  | "report-issue"
+  | "admin-menu"
+  | "manage-equipment"
+  | "equipment-detail";
 
-function AppInner() {
+function AppContent() {
   const { auth, logout } = useAuth();
-  const [splashDone, setSplashDone] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState<Screen>("home");
-  const [equipmentDetailId, setEquipmentDetailId] = useState("");
-  const [userRole, setUserRole] = useState<UserRole>(null);
+  const [view, setView] = useState<View>("splash");
+  const [selectedEquipmentId, setSelectedEquipmentId] = useState<string | null>(
+    null,
+  );
+  const authRef = useRef(auth);
+  authRef.current = auth;
 
+  // Splash screen for 1.5s on load, then navigate based on auth state
   useEffect(() => {
-    const t = setTimeout(() => setSplashDone(true), 2000);
+    const t = setTimeout(() => {
+      const currentAuth = authRef.current;
+      setView(
+        currentAuth
+          ? currentAuth.roles?.includes("admin")
+            ? "admin-menu"
+            : "operator-home"
+          : "signin",
+      );
+    }, 1500);
     return () => clearTimeout(t);
   }, []);
 
+  // Sync view with auth changes after splash
   useEffect(() => {
+    if (view === "splash") return;
     if (!auth) {
-      setUserRole(null);
-      setCurrentScreen("home");
+      setView("signin");
     }
-  }, [auth]);
+  }, [auth, view]);
 
-  if (!splashDone) return <SplashScreen />;
-  if (!auth) return <SignInScreen />;
+  // Hash-based navigation
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.replace("#", "") as View;
+      if (hash && hash !== view) setView(hash);
+    };
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, [view]);
 
-  const hasBothRoles =
-    auth.roles.includes("admin") && auth.roles.includes("agent");
-  const hasOnlyAgent = auth.roles.length === 1 && auth.roles[0] === "agent";
-
-  if (hasBothRoles && !userRole) {
-    return (
-      <SignOnScreen
-        currentUser={auth}
-        onAgentLogin={() => {
-          setUserRole("agent");
-          setCurrentScreen("home");
-        }}
-        onAdminLogin={() => {
-          setUserRole("admin");
-          setCurrentScreen("adminMenu");
-        }}
-        onBack={logout}
-      />
-    );
-  }
-
-  const effectiveRole: "agent" | "admin" =
-    userRole ?? (hasOnlyAgent ? "agent" : "agent");
-  const handleLogout = () => {
-    logout();
+  const navigate = (v: View) => {
+    window.location.hash = v;
+    setView(v);
   };
 
-  if (effectiveRole === "admin") {
-    if (currentScreen === "manageEquipment")
-      return (
-        <ManageEquipmentScreen onBack={() => setCurrentScreen("adminMenu")} />
-      );
-    if (currentScreen === "equipmentDetail")
-      return (
-        <EquipmentDetailScreen
-          equipmentId={equipmentDetailId}
-          onBack={() => setCurrentScreen("adminMenu")}
-        />
-      );
+  const handleLogout = () => {
+    logout();
+    navigate("signin");
+  };
+
+  if (view === "splash") return <SplashScreen />;
+
+  if (!auth) {
     return (
-      <AdminMenuScreen
-        currentUser={auth}
-        onManageEquipment={() => setCurrentScreen("manageEquipment")}
-        onViewEquipment={(id) => {
-          setEquipmentDetailId(id);
-          setCurrentScreen("equipmentDetail");
+      <SignInScreen
+        onLoginSuccess={(roles) => {
+          if (roles.includes("admin") && roles.includes("agent")) {
+            navigate("signon");
+          } else if (roles.includes("admin")) {
+            navigate("admin-menu");
+          } else {
+            navigate("operator-home");
+          }
         }}
-        onBack={() => setUserRole(null)}
-        onLogout={handleLogout}
       />
     );
   }
 
-  if (currentScreen === "checkout")
-    return (
-      <CheckOutScreen
-        onBack={() => setCurrentScreen("home")}
-        currentUser={auth}
-      />
-    );
-  if (currentScreen === "checkin")
-    return (
-      <CheckInScreen
-        onBack={() => setCurrentScreen("home")}
-        currentUser={auth}
-      />
-    );
-  if (currentScreen === "reportIssue")
-    return (
-      <ReportIssueScreen
-        onBack={() => setCurrentScreen("home")}
-        currentUser={auth}
-      />
-    );
-
-  return (
-    <OperatorHomeScreen
-      currentUser={auth}
-      onCheckOut={() => setCurrentScreen("checkout")}
-      onCheckIn={() => setCurrentScreen("checkin")}
-      onReportIssue={() => setCurrentScreen("reportIssue")}
-      onLogout={handleLogout}
-    />
-  );
+  switch (view) {
+    case "signon":
+      return (
+        <SignOnScreen
+          currentUser={auth}
+          onAgentLogin={() => navigate("operator-home")}
+          onAdminLogin={() => navigate("admin-menu")}
+          onBack={() => navigate("signin")}
+        />
+      );
+    case "operator-home":
+      return (
+        <OperatorHomeScreen
+          currentUser={auth}
+          onCheckOut={() => navigate("checkout")}
+          onCheckIn={() => navigate("checkin")}
+          onReportIssue={() => navigate("report-issue")}
+          onLogout={handleLogout}
+        />
+      );
+    case "checkout":
+      return (
+        <CheckOutScreen
+          currentUser={auth}
+          onBack={() => navigate("operator-home")}
+        />
+      );
+    case "checkin":
+      return (
+        <CheckInScreen
+          currentUser={auth}
+          onBack={() => navigate("operator-home")}
+        />
+      );
+    case "report-issue":
+      return (
+        <ReportIssueScreen
+          currentUser={auth}
+          onBack={() => navigate("operator-home")}
+        />
+      );
+    case "admin-menu":
+      return (
+        <AdminMenuScreen
+          currentUser={auth}
+          onManageEquipment={() => navigate("manage-equipment")}
+          onViewEquipment={(id) => {
+            setSelectedEquipmentId(id);
+            navigate("equipment-detail");
+          }}
+          onBack={() => {
+            if (auth.roles.includes("agent")) navigate("signon");
+            else navigate("signin");
+          }}
+          onLogout={handleLogout}
+        />
+      );
+    case "manage-equipment":
+      return <ManageEquipmentScreen onBack={() => navigate("admin-menu")} />;
+    case "equipment-detail":
+      return (
+        <EquipmentDetailScreen
+          equipmentId={selectedEquipmentId || ""}
+          onBack={() => navigate("admin-menu")}
+        />
+      );
+    default:
+      return null;
+  }
 }
 
 export default function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <OfflineIndicator />
-        <Toaster />
-        <AppInner />
+        <AppContent />
       </AuthProvider>
     </ErrorBoundary>
   );
