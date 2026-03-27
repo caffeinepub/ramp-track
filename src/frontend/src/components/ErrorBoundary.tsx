@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
+import homescreenBackground from "../assets/HomescreenBackground.jpg";
 import { clearCachedApp } from "../lib/clearCachedApp";
 
 interface Props {
@@ -51,7 +52,7 @@ class ErrorBoundary extends Component<Props, State> {
         <div
           className="min-h-screen flex items-center justify-center p-6"
           style={{
-            backgroundImage: "url(/assets/HomescreenBackground.jpg)",
+            backgroundImage: `url(${homescreenBackground})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}

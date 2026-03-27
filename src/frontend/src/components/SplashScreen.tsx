@@ -1,9 +1,11 @@
+import rampTrackSplash from "../assets/RampTrackSplash.png";
+
 export default function SplashScreen() {
   return (
     <div
       className="fixed inset-0"
       style={{
-        backgroundImage: "url(/assets/RampTrackSplash.png)",
+        backgroundImage: `url(${rampTrackSplash})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

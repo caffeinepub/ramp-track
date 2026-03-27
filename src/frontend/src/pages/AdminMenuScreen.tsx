@@ -1,3 +1,4 @@
+import homescreenBackground from "../assets/HomescreenBackground.jpg";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -34,7 +35,7 @@ export default function AdminMenuScreen({
     <div
       className="min-h-screen relative"
       style={{
-        backgroundImage: "url(/assets/HomescreenBackground.jpg)",
+        backgroundImage: `url(${homescreenBackground})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

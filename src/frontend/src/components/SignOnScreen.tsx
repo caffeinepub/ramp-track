@@ -1,4 +1,7 @@
 import { useEffect } from "react";
+import agentLogin from "../assets/AgentLogin.png";
+import signInBackgroundLower from "../assets/SignInBackgroundLower.jpg";
+import managementLogin from "../assets/managementlogin.png";
 
 interface CurrentUser {
   username: string;
@@ -32,7 +35,7 @@ export default function SignOnScreen({
     <div
       className="fixed inset-0 flex flex-col items-center justify-center p-6"
       style={{
-        backgroundImage: "url(/assets/SignInBackgroundLower.jpg)",
+        backgroundImage: `url(${signInBackgroundLower})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -46,7 +49,7 @@ export default function SignOnScreen({
           aria-label="Agent Login"
         >
           <img
-            src="/assets/AgentLogin.png"
+            src={agentLogin}
             alt="Agent Login"
             className="w-full h-auto rounded-2xl shadow-2xl"
           />
@@ -60,7 +63,7 @@ export default function SignOnScreen({
             aria-label="Management / Admin Login"
           >
             <img
-              src="/assets/managementlogin.png"
+              src={managementLogin}
               alt="Management / Admin Login"
               className="w-full h-auto rounded-2xl shadow-2xl"
             />

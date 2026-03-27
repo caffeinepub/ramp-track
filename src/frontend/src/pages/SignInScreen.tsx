@@ -1,4 +1,5 @@
 import { useState } from "react";
+import homescreenBackground from "../assets/HomescreenBackground.jpg";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -40,7 +41,7 @@ export default function SignInScreen() {
     <div
       className="flex min-h-screen items-center justify-center p-4 relative"
       style={{
-        backgroundImage: "url(/assets/HomescreenBackground.jpg)",
+        backgroundImage: `url(${homescreenBackground})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -166,8 +167,7 @@ export default function SignInScreen() {
           </CardContent>
         </Card>
         <div className="mt-6 text-center text-sm text-white/90 drop-shadow-lg">
-          © {new Date().getFullYear()} Ramp Track Systems. Built by Jayson
-          James.
+          © Jayson James & Ramp Track Systems
         </div>
       </div>
     </div>

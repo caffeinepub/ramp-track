@@ -1,6 +1,7 @@
 import { AlertCircle, CheckCircle2, Loader2, Search } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import homescreenBackground from "../assets/HomescreenBackground.jpg";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -167,7 +168,7 @@ export default function ManageEquipmentScreen({
     <div
       className="min-h-screen relative"
       style={{
-        backgroundImage: "url(/assets/HomescreenBackground.jpg)",
+        backgroundImage: `url(${homescreenBackground})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

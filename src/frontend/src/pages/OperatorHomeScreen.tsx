@@ -1,3 +1,8 @@
+import checkInIcon1 from "../assets/Check_In_Icon-1.png";
+import checkOutIcon1 from "../assets/Check_Out_Icon-1.png";
+import homescreenBackground from "../assets/HomescreenBackground.jpg";
+import reportIssueIcon1 from "../assets/Report_Issue_Icon-1.png";
+
 export default function OperatorHomeScreen({
   onCheckOut,
   onCheckIn,
@@ -15,7 +20,7 @@ export default function OperatorHomeScreen({
     <div
       className="min-h-screen relative"
       style={{
-        backgroundImage: "url(/assets/HomescreenBackground.jpg)",
+        backgroundImage: `url(${homescreenBackground})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -60,7 +65,7 @@ export default function OperatorHomeScreen({
               aria-label="Take Equipment"
             >
               <img
-                src="/assets/Check_Out_Icon-1.png"
+                src={checkOutIcon1}
                 alt="Take Equipment"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
@@ -73,7 +78,7 @@ export default function OperatorHomeScreen({
               aria-label="Return Equipment"
             >
               <img
-                src="/assets/Check_In_Icon-1.png"
+                src={checkInIcon1}
                 alt="Return Equipment"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
@@ -86,7 +91,7 @@ export default function OperatorHomeScreen({
               aria-label="Report Issue"
             >
               <img
-                src="/assets/Report_Issue_Icon-1.png"
+                src={reportIssueIcon1}
                 alt="Report Issue"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
@@ -94,7 +99,7 @@ export default function OperatorHomeScreen({
           </div>
         </main>
         <footer className="py-6 text-center text-sm text-white/90 drop-shadow-lg">
-          Built by Jayson James and Ramp Track Systems.
+          © Jayson James & Ramp Track Systems
         </footer>
       </div>
     </div>
