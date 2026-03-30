@@ -1,7 +1,11 @@
 import { useEffect } from "react";
-import agentLogin from "../assets/AgentLogin.png";
-import signInBackgroundLower from "../assets/SignInBackgroundLower.jpg";
-import managementLogin from "../assets/managementlogin.png";
+
+const agentLogin =
+  "/assets/agentlogin-019d2e49-69e7-73fe-8172-a52b87efe1eb.png";
+const signInBackgroundLower =
+  "/assets/signinbackgroundlower-019d2e4a-fc0d-77ac-8d6b-f27f72365149.jpg";
+const managementLogin =
+  "/assets/managementlogin-019d2e4a-4e21-770e-83b4-0b2873150efd.png";
 
 interface CurrentUser {
   username: string;

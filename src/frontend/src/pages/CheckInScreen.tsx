@@ -1,6 +1,9 @@
+import { ScanLine } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import homescreenBackground from "../assets/HomescreenBackground.jpg";
+const homescreenBackground =
+  "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
+import BarcodeScanner from "../components/BarcodeScanner";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -12,6 +15,7 @@ import {
 import { recordEvent } from "../lib/equipmentHistory";
 import {
   type EquipmentRecord,
+  findById,
   getAllEquipment,
   updateEquipment,
 } from "../lib/equipmentRegistry";
@@ -22,6 +26,7 @@ export default function CheckInScreen({
 }: { onBack: () => void; currentUser: { username: string; badge: string } }) {
   const [selected, setSelected] = useState<EquipmentRecord | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const assigned = getAllEquipment().filter((e) => e.status === "ASSIGNED");
 
   const handleConfirm = async () => {
@@ -47,6 +52,18 @@ export default function CheckInScreen({
     }
   };
 
+  const handleScanResult = (id: string) => {
+    setScannerOpen(false);
+    const eq = findById(id);
+    if (eq && eq.status === "ASSIGNED") {
+      setSelected(eq);
+    } else if (eq) {
+      toast.error(`${id} is not currently checked out (status: ${eq.status})`);
+    } else {
+      toast.error(`Equipment ${id} not found in registry`);
+    }
+  };
+
   return (
     <div
       className="min-h-screen relative"
@@ -58,6 +75,13 @@ export default function CheckInScreen({
         backgroundAttachment: "fixed",
       }}
     >
+      {scannerOpen && (
+        <BarcodeScanner
+          mode="equipment"
+          onResult={handleScanResult}
+          onClose={() => setScannerOpen(false)}
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/40 to-black/30 backdrop-blur-[1px]" />
       <div className="relative z-10">
         <header className="bg-card/95 backdrop-blur-sm border-b shadow-lg">
@@ -68,13 +92,24 @@ export default function CheckInScreen({
               </h1>
               <p className="text-sm text-muted-foreground">Check In</p>
             </div>
-            <Button
-              variant="outline"
-              onClick={onBack}
-              data-ocid="checkin.back.button"
-            >
-              ← Back
-            </Button>
+            <div className="flex gap-2 items-center">
+              <Button
+                variant="outline"
+                onClick={() => setScannerOpen(true)}
+                data-ocid="checkin.scan.button"
+                className="px-3"
+                aria-label="Scan equipment"
+              >
+                <ScanLine className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onBack}
+                data-ocid="checkin.back.button"
+              >
+                ← Back
+              </Button>
+            </div>
           </div>
         </header>
         <main className="container mx-auto px-4 py-6">

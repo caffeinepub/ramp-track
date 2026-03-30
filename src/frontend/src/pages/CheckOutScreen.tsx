@@ -1,7 +1,9 @@
-import { Search } from "lucide-react";
+import { ScanLine, Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import homescreenBackground from "../assets/HomescreenBackground.jpg";
+const homescreenBackground =
+  "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
+import BarcodeScanner from "../components/BarcodeScanner";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -14,6 +16,7 @@ import { Input } from "../components/ui/input";
 import { recordEvent } from "../lib/equipmentHistory";
 import {
   type EquipmentRecord,
+  findById,
   getAllEquipment,
   updateEquipment,
 } from "../lib/equipmentRegistry";
@@ -25,6 +28,7 @@ export default function CheckOutScreen({
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<EquipmentRecord | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const available = getAllEquipment().filter(
     (e) =>
@@ -58,6 +62,18 @@ export default function CheckOutScreen({
     }
   };
 
+  const handleScanResult = (id: string) => {
+    setScannerOpen(false);
+    const eq = findById(id);
+    if (eq && eq.status === "AVAILABLE") {
+      setSelected(eq);
+    } else if (eq) {
+      toast.error(`${id} is not available (status: ${eq.status})`);
+    } else {
+      toast.error(`Equipment ${id} not found in registry`);
+    }
+  };
+
   return (
     <div
       className="min-h-screen relative"
@@ -69,6 +85,13 @@ export default function CheckOutScreen({
         backgroundAttachment: "fixed",
       }}
     >
+      {scannerOpen && (
+        <BarcodeScanner
+          mode="equipment"
+          onResult={handleScanResult}
+          onClose={() => setScannerOpen(false)}
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/40 to-black/30 backdrop-blur-[1px]" />
       <div className="relative z-10">
         <header className="bg-card/95 backdrop-blur-sm border-b shadow-lg">
@@ -163,15 +186,26 @@ export default function CheckOutScreen({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    data-ocid="checkout.search_input"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search equipment..."
-                    className="pl-10"
-                  />
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      data-ocid="checkout.search_input"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search equipment..."
+                      className="pl-10"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => setScannerOpen(true)}
+                    data-ocid="checkout.scan.button"
+                    className="shrink-0 px-3"
+                    aria-label="Scan equipment"
+                  >
+                    <ScanLine className="h-5 w-5" />
+                  </Button>
                 </div>
                 {available.length === 0 ? (
                   <div

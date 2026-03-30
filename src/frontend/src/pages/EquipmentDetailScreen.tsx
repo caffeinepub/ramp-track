@@ -1,4 +1,5 @@
-import homescreenBackground from "../assets/HomescreenBackground.jpg";
+const homescreenBackground =
+  "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {

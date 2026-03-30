@@ -1,5 +1,8 @@
+import { ScanLine } from "lucide-react";
 import { useState } from "react";
-import homescreenBackground from "../assets/HomescreenBackground.jpg";
+const homescreenBackground =
+  "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
+import BarcodeScanner from "../components/BarcodeScanner";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -21,6 +24,7 @@ export default function SignInScreen({
   const [password, setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [error, setError] = useState("");
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -53,6 +57,31 @@ export default function SignInScreen({
     }
   };
 
+  const handleBadgeScan = async (badgeId: string) => {
+    setScannerOpen(false);
+    setIsLoggingIn(true);
+    setError("");
+    try {
+      let username: string;
+      let roles: string[];
+      if (badgeId === "970251" || badgeId === "97025101") {
+        username = "Jayson James";
+        roles = ["admin", "agent"];
+      } else {
+        username = badgeId;
+        roles = ["agent"];
+      }
+      await login({ username, password: badgeId, badge: badgeId });
+      if (onLoginSuccess) {
+        onLoginSuccess(roles);
+      }
+    } catch (err: unknown) {
+      setError((err as Error).message || "Badge login failed.");
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
   if (auth) return null;
 
   return (
@@ -66,6 +95,13 @@ export default function SignInScreen({
         backgroundAttachment: "fixed",
       }}
     >
+      {scannerOpen && (
+        <BarcodeScanner
+          mode="badge"
+          onResult={handleBadgeScan}
+          onClose={() => setScannerOpen(false)}
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/50 backdrop-blur-[2px]" />
       <div className="relative z-10 w-full max-w-md">
         <Card className="bg-card/95 backdrop-blur-xl shadow-2xl border-2">
@@ -171,6 +207,17 @@ export default function SignInScreen({
                       : "🛡️ Management Login"}
                   </>
                 )}
+              </Button>
+              <Button
+                data-ocid="signin.scan.button"
+                variant="outline"
+                className="w-full"
+                size="lg"
+                onClick={() => setScannerOpen(true)}
+                disabled={isLoggingIn}
+              >
+                <ScanLine className="mr-2 h-5 w-5" />
+                Scan Badge
               </Button>
             </div>
             <div className="text-center text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
