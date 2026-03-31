@@ -1,5 +1,5 @@
-import { ScanLine, Search } from "lucide-react";
-import { useState } from "react";
+import { ScanLine } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
@@ -12,12 +12,10 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Input } from "../components/ui/input";
 import { recordEvent } from "../lib/equipmentHistory";
 import {
   type EquipmentRecord,
   findById,
-  getAllEquipment,
   updateEquipment,
 } from "../lib/equipmentRegistry";
 
@@ -25,18 +23,14 @@ export default function CheckOutScreen({
   onBack,
   currentUser,
 }: { onBack: () => void; currentUser: { username: string; badge: string } }) {
-  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<EquipmentRecord | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
 
-  const available = getAllEquipment().filter(
-    (e) =>
-      e.status === "AVAILABLE" &&
-      (e.id.toLowerCase().includes(search.toLowerCase()) ||
-        e.label?.toLowerCase().includes(search.toLowerCase()) ||
-        e.type.toLowerCase().includes(search.toLowerCase())),
-  );
+  // Auto-open scanner on mount
+  useEffect(() => {
+    setScannerOpen(true);
+  }, []);
 
   const handleConfirm = async () => {
     if (!selected) return;
@@ -154,11 +148,11 @@ export default function CheckOutScreen({
                   <Button
                     variant="outline"
                     className="flex-1"
-                    onClick={() => setSelected(null)}
+                    onClick={() => setScannerOpen(true)}
                     disabled={isProcessing}
                     data-ocid="checkout.cancel.button"
                   >
-                    Cancel
+                    Scan Again
                   </Button>
                   <Button
                     className="flex-1 bg-blue-700 hover:bg-blue-600"
@@ -180,75 +174,35 @@ export default function CheckOutScreen({
                 borderRadius: "16px",
               }}
             >
-              <CardHeader>
-                <CardTitle style={{ color: "#ffffff" }}>
-                  Available Equipment
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      data-ocid="checkout.search_input"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder="Search equipment..."
-                      className="pl-10"
-                    />
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => setScannerOpen(true)}
-                    data-ocid="checkout.scan.button"
-                    className="shrink-0 px-3"
-                    aria-label="Scan equipment"
-                  >
-                    <ScanLine className="h-5 w-5" />
-                  </Button>
+              <CardContent className="flex flex-col items-center justify-center py-16 space-y-6">
+                <div
+                  className="rounded-full p-6"
+                  style={{
+                    background: "rgba(30,41,59,0.7)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                  }}
+                >
+                  <ScanLine
+                    className="h-12 w-12"
+                    style={{ color: "#60a5fa" }}
+                  />
                 </div>
-                {available.length === 0 ? (
-                  <div
-                    data-ocid="checkout.empty_state"
-                    className="text-center py-12"
-                    style={{ color: "#cbd5f5" }}
-                  >
-                    <p className="text-lg font-medium mb-2">
-                      No available equipment
-                    </p>
-                    <p className="text-sm">
-                      {search
-                        ? "Try a different search"
-                        : "All equipment is currently assigned"}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                    {available.map((eq, i) => (
-                      <button
-                        key={eq.id}
-                        type="button"
-                        data-ocid={`checkout.item.${i + 1}`}
-                        className="w-full text-left flex items-center justify-between p-4 rounded-lg hover:bg-white/5 transition-colors"
-                        style={{
-                          background: "rgba(30,41,59,0.5)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                        }}
-                        onClick={() => setSelected(eq)}
-                      >
-                        <div>
-                          <p className="font-semibold text-white">{eq.id}</p>
-                          {eq.label && (
-                            <p className="text-sm" style={{ color: "#cbd5f5" }}>
-                              {eq.label}
-                            </p>
-                          )}
-                        </div>
-                        <Badge variant="default">AVAILABLE</Badge>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <div className="text-center">
+                  <p className="text-xl font-bold text-white mb-2">
+                    Scan Equipment
+                  </p>
+                  <p className="text-sm" style={{ color: "#cbd5f5" }}>
+                    Point your camera at the equipment barcode or QR code
+                  </p>
+                </div>
+                <Button
+                  onClick={() => setScannerOpen(true)}
+                  className="bg-blue-700 hover:bg-blue-600 px-8 py-3 text-lg"
+                  data-ocid="checkout.scan.button"
+                >
+                  <ScanLine className="h-5 w-5 mr-2" />
+                  Open Scanner
+                </Button>
               </CardContent>
             </Card>
           )}

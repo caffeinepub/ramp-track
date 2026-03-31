@@ -1,5 +1,5 @@
 import { ScanLine } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
@@ -16,7 +16,6 @@ import { recordEvent } from "../lib/equipmentHistory";
 import {
   type EquipmentRecord,
   findById,
-  getAllEquipment,
   updateEquipment,
 } from "../lib/equipmentRegistry";
 
@@ -27,7 +26,11 @@ export default function CheckInScreen({
   const [selected, setSelected] = useState<EquipmentRecord | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
-  const assigned = getAllEquipment().filter((e) => e.status === "ASSIGNED");
+
+  // Auto-open scanner on mount
+  useEffect(() => {
+    setScannerOpen(true);
+  }, []);
 
   const handleConfirm = async () => {
     if (!selected) return;
@@ -92,24 +95,13 @@ export default function CheckInScreen({
               </h1>
               <p className="text-sm text-muted-foreground">Check In</p>
             </div>
-            <div className="flex gap-2 items-center">
-              <Button
-                variant="outline"
-                onClick={() => setScannerOpen(true)}
-                data-ocid="checkin.scan.button"
-                className="px-3"
-                aria-label="Scan equipment"
-              >
-                <ScanLine className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onBack}
-                data-ocid="checkin.back.button"
-              >
-                ← Back
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              onClick={onBack}
+              data-ocid="checkin.back.button"
+            >
+              ← Back
+            </Button>
           </div>
         </header>
         <main className="container mx-auto px-4 py-6">
@@ -160,11 +152,11 @@ export default function CheckInScreen({
                   <Button
                     variant="outline"
                     className="flex-1"
-                    onClick={() => setSelected(null)}
+                    onClick={() => setScannerOpen(true)}
                     disabled={isProcessing}
                     data-ocid="checkin.cancel.button"
                   >
-                    Cancel
+                    Scan Again
                   </Button>
                   <Button
                     className="flex-1 bg-green-700 hover:bg-green-600"
@@ -186,60 +178,35 @@ export default function CheckInScreen({
                 borderRadius: "16px",
               }}
             >
-              <CardHeader>
-                <CardTitle style={{ color: "#ffffff" }}>
-                  Assigned Equipment
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {assigned.length === 0 ? (
-                  <div
-                    data-ocid="checkin.empty_state"
-                    className="text-center py-12"
-                    style={{ color: "#cbd5f5" }}
-                  >
-                    <p className="text-lg font-medium mb-2">
-                      No assigned equipment
-                    </p>
-                    <p className="text-sm">
-                      All equipment is currently available
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                    {assigned.map((eq, i) => (
-                      <button
-                        key={eq.id}
-                        type="button"
-                        data-ocid={`checkin.item.${i + 1}`}
-                        className="w-full text-left flex items-center justify-between p-4 rounded-lg hover:bg-white/5 transition-colors"
-                        style={{
-                          background: "rgba(30,41,59,0.5)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                        }}
-                        onClick={() => setSelected(eq)}
-                      >
-                        <div>
-                          <p className="font-semibold text-white">{eq.id}</p>
-                          {eq.label && (
-                            <p className="text-sm" style={{ color: "#cbd5f5" }}>
-                              {eq.label}
-                            </p>
-                          )}
-                          {eq.lastOperator && (
-                            <p
-                              className="text-xs mt-1"
-                              style={{ color: "#cbd5f5" }}
-                            >
-                              Operator: {eq.lastOperator}
-                            </p>
-                          )}
-                        </div>
-                        <Badge variant="secondary">ASSIGNED</Badge>
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <CardContent className="flex flex-col items-center justify-center py-16 space-y-6">
+                <div
+                  className="rounded-full p-6"
+                  style={{
+                    background: "rgba(30,41,59,0.7)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                  }}
+                >
+                  <ScanLine
+                    className="h-12 w-12"
+                    style={{ color: "#4ade80" }}
+                  />
+                </div>
+                <div className="text-center">
+                  <p className="text-xl font-bold text-white mb-2">
+                    Scan Equipment
+                  </p>
+                  <p className="text-sm" style={{ color: "#cbd5f5" }}>
+                    Point your camera at the equipment barcode or QR code
+                  </p>
+                </div>
+                <Button
+                  onClick={() => setScannerOpen(true)}
+                  className="bg-green-700 hover:bg-green-600 px-8 py-3 text-lg"
+                  data-ocid="checkin.scan.button"
+                >
+                  <ScanLine className="h-5 w-5 mr-2" />
+                  Open Scanner
+                </Button>
               </CardContent>
             </Card>
           )}
