@@ -37,13 +37,14 @@ function AppContent() {
   useEffect(() => {
     const t = setTimeout(() => {
       const currentAuth = authRef.current;
-      setView(
-        currentAuth
-          ? currentAuth.roles?.includes("admin")
-            ? "admin-menu"
-            : "operator-home"
-          : "signin",
-      );
+      if (currentAuth) {
+        // Already logged in — go straight to the appropriate screen
+        setView(
+          currentAuth.roles?.includes("admin") ? "admin-menu" : "operator-home",
+        );
+      } else {
+        setView("signin");
+      }
     }, 1500);
     return () => clearTimeout(t);
   }, []);
@@ -81,14 +82,10 @@ function AppContent() {
   if (!auth) {
     return (
       <SignInScreen
-        onLoginSuccess={(roles) => {
-          if (roles.includes("admin") && roles.includes("agent")) {
-            navigate("signon");
-          } else if (roles.includes("admin")) {
-            navigate("admin-menu");
-          } else {
-            navigate("operator-home");
-          }
+        onLoginSuccess={() => {
+          // All users go to SignOnScreen — it shows only the relevant
+          // button(s) based on role (agent-only sees only agent button).
+          navigate("signon");
         }}
       />
     );
@@ -144,10 +141,7 @@ function AppContent() {
             setSelectedEquipmentId(id);
             navigate("equipment-detail");
           }}
-          onBack={() => {
-            if (auth.roles.includes("agent")) navigate("signon");
-            else navigate("signin");
-          }}
+          onBack={() => navigate("signon")}
           onLogout={handleLogout}
         />
       );

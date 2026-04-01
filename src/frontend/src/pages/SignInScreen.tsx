@@ -19,7 +19,6 @@ export default function SignInScreen({
   onLoginSuccess,
 }: { onLoginSuccess?: (roles: string[]) => void }) {
   const { login, auth } = useAuth();
-  const [loginMode, setLoginMode] = useState<"operator" | "admin">("operator");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -35,7 +34,6 @@ export default function SignInScreen({
     setError("");
     try {
       await login({ username: email, password, badge: email });
-      // Find the roles for the logged-in user
       const USERS = [
         {
           username: "operator@demo.com",
@@ -124,52 +122,16 @@ export default function SignInScreen({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                data-ocid="signin.operator.button"
-                variant={loginMode === "operator" ? "default" : "outline"}
-                onClick={() => {
-                  setLoginMode("operator");
-                  setEmail("operator@demo.com");
-                  setPassword("test123");
-                  setError("");
-                }}
-                disabled={isLoggingIn}
-                className="h-auto py-4 flex flex-col gap-2"
-              >
-                <span className="text-2xl">👤</span>
-                <span className="text-sm font-semibold">Operator</span>
-              </Button>
-              <Button
-                data-ocid="signin.admin.button"
-                variant={loginMode === "admin" ? "default" : "outline"}
-                onClick={() => {
-                  setLoginMode("admin");
-                  setEmail("970251");
-                  setPassword("test123");
-                  setError("");
-                }}
-                disabled={isLoggingIn}
-                className="h-auto py-4 flex flex-col gap-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white border-orange-400/50"
-              >
-                <span className="text-2xl">🛡️</span>
-                <span className="text-sm font-semibold">Management</span>
-              </Button>
-            </div>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">
-                  {loginMode === "operator" ? "Email" : "Employee ID"}
-                </Label>
+                <Label htmlFor="email">Employee ID / Email</Label>
                 <Input
                   data-ocid="signin.email.input"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoggingIn}
-                  placeholder={
-                    loginMode === "operator" ? "operator@demo.com" : "970251"
-                  }
+                  placeholder="Enter your ID or email"
                 />
               </div>
               <div className="space-y-2">
@@ -181,7 +143,7 @@ export default function SignInScreen({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoggingIn}
-                  placeholder="test123"
+                  placeholder="Enter your password"
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 />
               </div>
@@ -206,11 +168,7 @@ export default function SignInScreen({
                     Logging in...
                   </>
                 ) : (
-                  <>
-                    {loginMode === "operator"
-                      ? "👤 Operator Login"
-                      : "🛡️ Management Login"}
-                  </>
+                  "Sign In"
                 )}
               </Button>
               <Button
