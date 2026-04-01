@@ -113,7 +113,12 @@ export default function SignInScreen({
                 </div>
               </div>
             </div>
-            <CardTitle className="text-3xl font-bold">Ramp Track</CardTitle>
+            <CardTitle
+              className="text-3xl font-bold"
+              style={{ color: "#0078D2" }}
+            >
+              Ramp Track
+            </CardTitle>
             <CardDescription className="text-base">
               Airport Ground Equipment Tracking
             </CardDescription>

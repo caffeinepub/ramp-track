@@ -36,7 +36,9 @@ export default function OperatorHomeScreen({
         <header className="bg-card/90 backdrop-blur-sm border-b shadow-lg">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Ramp Track</h1>
+              <h1 className="text-2xl font-bold" style={{ color: "#0078D2" }}>
+                Ramp Track
+              </h1>
               <p className="text-sm text-muted-foreground">
                 {currentUser.badge} · {currentUser.username}
               </p>

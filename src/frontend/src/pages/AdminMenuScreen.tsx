@@ -48,7 +48,9 @@ export default function AdminMenuScreen({
         <header className="bg-card/95 backdrop-blur-sm border-b shadow-lg">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Admin Menu</h1>
+              <h1 className="text-2xl font-bold" style={{ color: "#0078D2" }}>
+                Admin Menu
+              </h1>
               <p className="text-sm text-muted-foreground">
                 {currentUser.badge} · Management
               </p>
