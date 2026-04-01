@@ -1,3 +1,4 @@
+import { useState } from "react";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
 import { Badge } from "../components/ui/badge";
@@ -10,6 +11,8 @@ import {
 } from "../components/ui/card";
 import { getAllEvents } from "../lib/equipmentHistory";
 import { getAllEquipment } from "../lib/equipmentRegistry";
+
+type FilterType = "ALL" | "AVAILABLE" | "ASSIGNED" | "MAINTENANCE";
 
 export default function AdminMenuScreen({
   onManageEquipment,
@@ -24,6 +27,7 @@ export default function AdminMenuScreen({
   onLogout: () => void;
   currentUser: { username: string; badge: string; roles: string[] };
 }) {
+  const [activeFilter, setActiveFilter] = useState<FilterType>("ALL");
   const equipment = getAllEquipment();
   const events = getAllEvents().slice(0, 10);
   const available = equipment.filter((e) => e.status === "AVAILABLE").length;
@@ -31,6 +35,43 @@ export default function AdminMenuScreen({
   const maintenance = equipment.filter(
     (e) => e.status === "MAINTENANCE",
   ).length;
+
+  const filteredEquipment =
+    activeFilter === "ALL"
+      ? equipment
+      : equipment.filter((e) => e.status === activeFilter);
+
+  const stats: {
+    label: string;
+    value: number;
+    color: string;
+    filter: FilterType;
+  }[] = [
+    {
+      label: "Total",
+      value: equipment.length,
+      color: "#cbd5f5",
+      filter: "ALL",
+    },
+    {
+      label: "Available",
+      value: available,
+      color: "#4ade80",
+      filter: "AVAILABLE",
+    },
+    {
+      label: "Assigned",
+      value: assigned,
+      color: "#60a5fa",
+      filter: "ASSIGNED",
+    },
+    {
+      label: "Maintenance",
+      value: maintenance,
+      color: "#f87171",
+      filter: "MAINTENANCE",
+    },
+  ];
 
   return (
     <div
@@ -75,18 +116,23 @@ export default function AdminMenuScreen({
         </header>
         <main className="container mx-auto px-4 py-6 space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: "Total", value: equipment.length, color: "#cbd5f5" },
-              { label: "Available", value: available, color: "#4ade80" },
-              { label: "Assigned", value: assigned, color: "#60a5fa" },
-              { label: "Maintenance", value: maintenance, color: "#f87171" },
-            ].map((s) => (
-              <div
+            {stats.map((s) => (
+              <button
                 key={s.label}
-                className="rounded-xl p-4 border text-center"
+                type="button"
+                onClick={() => setActiveFilter(s.filter)}
+                className="rounded-xl p-4 border text-center transition-all cursor-pointer"
                 style={{
-                  background: "rgba(15,23,42,0.92)",
-                  borderColor: "rgba(255,255,255,0.18)",
+                  background:
+                    activeFilter === s.filter
+                      ? "rgba(0,120,210,0.25)"
+                      : "rgba(15,23,42,0.92)",
+                  borderColor:
+                    activeFilter === s.filter
+                      ? "#0078D2"
+                      : "rgba(255,255,255,0.18)",
+                  boxShadow:
+                    activeFilter === s.filter ? "0 0 0 2px #0078D2" : undefined,
                 }}
               >
                 <p className="text-3xl font-bold" style={{ color: s.color }}>
@@ -95,7 +141,7 @@ export default function AdminMenuScreen({
                 <p className="text-sm mt-1" style={{ color: "#cbd5f5" }}>
                   {s.label}
                 </p>
-              </div>
+              </button>
             ))}
           </div>
           <Card
@@ -138,42 +184,71 @@ export default function AdminMenuScreen({
             }}
           >
             <CardHeader>
-              <CardTitle style={{ color: "#ffffff" }}>All Equipment</CardTitle>
+              <CardTitle style={{ color: "#ffffff" }}>
+                {activeFilter === "ALL"
+                  ? "All Equipment"
+                  : `${activeFilter.charAt(0) + activeFilter.slice(1).toLowerCase()} Equipment`}
+                <span
+                  className="ml-2 text-base font-normal"
+                  style={{ color: "#94a3b8" }}
+                >
+                  ({filteredEquipment.length})
+                </span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {equipment.map((eq) => (
-                  <button
-                    key={eq.id}
-                    type="button"
-                    onClick={() => onViewEquipment(eq.id)}
-                    className="w-full text-left flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
-                    style={{
-                      background: "rgba(30,41,59,0.5)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                    }}
-                  >
-                    <div>
-                      <p className="font-semibold text-white">{eq.id}</p>
-                      {eq.label && (
-                        <p className="text-xs" style={{ color: "#cbd5f5" }}>
-                          {eq.label}
-                        </p>
-                      )}
-                    </div>
-                    <Badge
-                      variant={
-                        eq.status === "AVAILABLE"
-                          ? "default"
-                          : eq.status === "ASSIGNED"
-                            ? "secondary"
-                            : "destructive"
-                      }
+                {filteredEquipment.length === 0 ? (
+                  <p className="text-center py-4" style={{ color: "#94a3b8" }}>
+                    No equipment in this category.
+                  </p>
+                ) : (
+                  filteredEquipment.map((eq) => (
+                    <button
+                      key={eq.id}
+                      type="button"
+                      onClick={() => onViewEquipment(eq.id)}
+                      className="w-full text-left flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
+                      style={{
+                        background: "rgba(30,41,59,0.5)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                      }}
                     >
-                      {eq.status}
-                    </Badge>
-                  </button>
-                ))}
+                      <div>
+                        <p className="font-semibold text-white">{eq.id}</p>
+                        {eq.label && (
+                          <p className="text-xs" style={{ color: "#cbd5f5" }}>
+                            {eq.label}
+                          </p>
+                        )}
+                        {eq.status === "ASSIGNED" && eq.location && (
+                          <p
+                            className="text-xs mt-0.5"
+                            style={{ color: "#94a3b8" }}
+                          >
+                            📍 {eq.location}
+                          </p>
+                        )}
+                        {eq.status === "ASSIGNED" && eq.checkoutTime && (
+                          <p className="text-xs" style={{ color: "#94a3b8" }}>
+                            🕐 {new Date(eq.checkoutTime).toLocaleTimeString()}
+                          </p>
+                        )}
+                      </div>
+                      <Badge
+                        variant={
+                          eq.status === "AVAILABLE"
+                            ? "default"
+                            : eq.status === "ASSIGNED"
+                              ? "secondary"
+                              : "destructive"
+                        }
+                      >
+                        {eq.status}
+                      </Badge>
+                    </button>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -218,6 +293,14 @@ export default function AdminMenuScreen({
                         <p className="text-xs" style={{ color: "#cbd5f5" }}>
                           by {ev.operator}
                         </p>
+                        {ev.location && (
+                          <p
+                            className="text-xs mt-0.5"
+                            style={{ color: "#94a3b8" }}
+                          >
+                            📍 {ev.location}
+                          </p>
+                        )}
                         {ev.notes && (
                           <p
                             className="text-xs mt-1"

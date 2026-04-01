@@ -18,6 +18,7 @@ import {
   findById,
   updateEquipment,
 } from "../lib/equipmentRegistry";
+import { getLocationString } from "../lib/gateLocator";
 
 export default function CheckOutScreen({
   onBack,
@@ -26,6 +27,7 @@ export default function CheckOutScreen({
   const [selected, setSelected] = useState<EquipmentRecord | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [locationLabel, setLocationLabel] = useState<string | null>(null);
 
   // Auto-open scanner on mount
   useEffect(() => {
@@ -36,16 +38,20 @@ export default function CheckOutScreen({
     if (!selected) return;
     setIsProcessing(true);
     try {
+      const location = await getLocationString();
+      setLocationLabel(location);
       recordEvent({
         equipmentId: selected.id,
         eventType: "CHECK_OUT",
         operator: currentUser.badge,
         timestamp: Date.now(),
+        location,
       });
       updateEquipment(selected.id, {
         status: "ASSIGNED",
         lastOperator: currentUser.badge,
         checkoutTime: Date.now(),
+        location,
       });
       toast.success(`Checked out ${selected.id} successfully`);
       onBack();
@@ -91,7 +97,7 @@ export default function CheckOutScreen({
         <header className="bg-card/95 backdrop-blur-sm border-b shadow-lg">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">
+              <h1 className="text-2xl font-bold" style={{ color: "#0078D2" }}>
                 Take Equipment
               </h1>
               <p className="text-sm text-muted-foreground">Check Out</p>
@@ -144,6 +150,11 @@ export default function CheckOutScreen({
                     {currentUser.badge}
                   </span>
                 </p>
+                {locationLabel && (
+                  <p style={{ color: "#94a3b8" }} className="text-sm">
+                    📍 {locationLabel}
+                  </p>
+                )}
                 <div className="flex gap-3">
                   <Button
                     variant="outline"
@@ -160,7 +171,9 @@ export default function CheckOutScreen({
                     disabled={isProcessing}
                     data-ocid="checkout.confirm.button"
                   >
-                    {isProcessing ? "Processing..." : "✓ Confirm Check Out"}
+                    {isProcessing
+                      ? "Getting location..."
+                      : "✓ Confirm Check Out"}
                   </Button>
                 </div>
               </CardContent>

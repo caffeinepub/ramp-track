@@ -2,7 +2,8 @@ export type EquipmentType =
   | "TUG"
   | "ELECTRIC_TUG"
   | "STANDUP_PUSHBACK"
-  | "LAMBO_PUSHBACK";
+  | "LAMBO_PUSHBACK"
+  | "DIESEL_TUG";
 export type EquipmentStatus = "AVAILABLE" | "ASSIGNED" | "MAINTENANCE";
 
 export interface EquipmentRecord {
@@ -20,7 +21,46 @@ export interface EquipmentRecord {
 
 const STORAGE_KEY = "ramptrack_equipment";
 
+const DIESEL_TUGS: EquipmentRecord[] = [
+  {
+    id: "TV0637",
+    type: "DIESEL_TUG",
+    label: "Diesel Tug TV0637",
+    status: "AVAILABLE",
+    createdAt: Date.now(),
+  },
+  {
+    id: "TV0989",
+    type: "DIESEL_TUG",
+    label: "Diesel Tug TV0989",
+    status: "AVAILABLE",
+    createdAt: Date.now(),
+  },
+  {
+    id: "TV1077",
+    type: "DIESEL_TUG",
+    label: "Diesel Tug TV1077",
+    status: "AVAILABLE",
+    createdAt: Date.now(),
+  },
+  {
+    id: "TV0884",
+    type: "DIESEL_TUG",
+    label: "Diesel Tug TV0884",
+    status: "AVAILABLE",
+    createdAt: Date.now(),
+  },
+  {
+    id: "TV0883",
+    type: "DIESEL_TUG",
+    label: "Diesel Tug TV0883",
+    status: "AVAILABLE",
+    createdAt: Date.now(),
+  },
+];
+
 const SEED_DATA: EquipmentRecord[] = [
+  ...DIESEL_TUGS,
   {
     id: "TUG-001",
     type: "TUG",
@@ -54,7 +94,18 @@ const SEED_DATA: EquipmentRecord[] = [
 function load(): EquipmentRecord[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const records: EquipmentRecord[] = JSON.parse(raw);
+      let dirty = false;
+      for (const tug of DIESEL_TUGS) {
+        if (!records.find((r) => r.id === tug.id)) {
+          records.unshift(tug);
+          dirty = true;
+        }
+      }
+      if (dirty) localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      return records;
+    }
   } catch {}
   localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_DATA));
   return SEED_DATA;

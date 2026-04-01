@@ -7,6 +7,7 @@ import AdminMenuScreen from "./pages/AdminMenuScreen";
 import CheckInScreen from "./pages/CheckInScreen";
 import CheckOutScreen from "./pages/CheckOutScreen";
 import EquipmentDetailScreen from "./pages/EquipmentDetailScreen";
+import LandingScreen from "./pages/LandingScreen";
 import ManageEquipmentScreen from "./pages/ManageEquipmentScreen";
 import OperatorHomeScreen from "./pages/OperatorHomeScreen";
 import ReportIssueScreen from "./pages/ReportIssueScreen";
@@ -14,6 +15,7 @@ import SignInScreen from "./pages/SignInScreen";
 
 type View =
   | "splash"
+  | "landing"
   | "signin"
   | "signon"
   | "operator-home"
@@ -43,7 +45,8 @@ function AppContent() {
           currentAuth.roles?.includes("admin") ? "admin-menu" : "operator-home",
         );
       } else {
-        setView("signin");
+        // New: go to landing screen first, not directly to login
+        setView("landing");
       }
     }, 1500);
     return () => clearTimeout(t);
@@ -79,6 +82,11 @@ function AppContent() {
 
   if (view === "splash") return <SplashScreen />;
 
+  // Landing screen — shown after splash when user is not authenticated
+  if (view === "landing") {
+    return <LandingScreen onLogin={() => navigate("signin")} />;
+  }
+
   if (!auth) {
     return (
       <SignInScreen
@@ -109,6 +117,7 @@ function AppContent() {
           onCheckIn={() => navigate("checkin")}
           onReportIssue={() => navigate("report-issue")}
           onLogout={handleLogout}
+          onBack={() => navigate("signon")}
         />
       );
     case "checkout":

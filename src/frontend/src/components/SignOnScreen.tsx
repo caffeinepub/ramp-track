@@ -49,7 +49,7 @@ export default function SignOnScreen({
         <button
           type="button"
           onClick={onAgentLogin}
-          className="w-[36%] max-w-xs transition-transform active:scale-95 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500/50 rounded-2xl"
+          className="w-[43%] max-w-xs transition-transform active:scale-95 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500/50 rounded-2xl"
           aria-label="Agent Login"
         >
           <img
@@ -63,7 +63,7 @@ export default function SignOnScreen({
           <button
             type="button"
             onClick={onAdminLogin}
-            className="w-[36%] max-w-xs transition-transform active:scale-95 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-500/50 rounded-2xl"
+            className="w-[43%] max-w-xs transition-transform active:scale-95 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-500/50 rounded-2xl"
             aria-label="Management / Admin Login"
           >
             <img

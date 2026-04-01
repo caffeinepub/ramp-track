@@ -12,12 +12,14 @@ export default function OperatorHomeScreen({
   onCheckIn,
   onReportIssue,
   onLogout,
+  onBack,
   currentUser,
 }: {
   onCheckOut: () => void;
   onCheckIn: () => void;
   onReportIssue: () => void;
   onLogout: () => void;
+  onBack: () => void;
   currentUser: { username: string; badge: string; roles: string[] };
 }) {
   return (
@@ -35,13 +37,24 @@ export default function OperatorHomeScreen({
       <div className="relative z-10 flex flex-col min-h-screen">
         <header className="bg-card/90 backdrop-blur-sm border-b shadow-lg">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold" style={{ color: "#0078D2" }}>
-                Ramp Track
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {currentUser.badge} · {currentUser.username}
-              </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                data-ocid="home.back.button"
+                onClick={onBack}
+                className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 border border-border transition-colors text-sm font-medium"
+                style={{ color: "#0078D2" }}
+              >
+                ← Back
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold" style={{ color: "#0078D2" }}>
+                  Ramp Track
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {currentUser.badge} · {currentUser.username}
+                </p>
+              </div>
             </div>
             <button
               type="button"
