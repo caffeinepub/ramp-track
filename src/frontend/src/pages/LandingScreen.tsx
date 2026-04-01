@@ -49,28 +49,34 @@ export default function LandingScreen({ onLogin }: { onLogin: () => void }) {
           onPointerLeave={() => setPressed(false)}
           style={{
             minWidth: "240px",
-            padding: "16px 48px",
-            borderRadius: "16px",
-            border: "none",
+            padding: pressed ? "19px 48px 17px" : "18px 48px",
+            borderRadius: "14px",
+            border: "1px solid rgba(255,255,255,0.18)",
             cursor: "pointer",
             fontSize: "18px",
-            fontWeight: 700,
-            letterSpacing: "0.06em",
+            fontWeight: 800,
+            letterSpacing: "0.07em",
             color: "#ffffff",
             background: pressed
-              ? "linear-gradient(135deg, #005fa3 0%, #0069bb 100%)"
-              : "linear-gradient(135deg, #0090f5 0%, #0078D2 60%, #005fa3 100%)",
+              ? "linear-gradient(180deg, #0070c4 0%, #00508f 100%)"
+              : "linear-gradient(180deg, #1a9eff 0%, #0078D2 55%, #005faa 100%)",
             boxShadow: pressed
-              ? "0 2px 8px rgba(0,0,0,0.35)"
-              : "0 6px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.12) inset",
+              ? "0 2px 6px rgba(0,100,200,0.25)"
+              : [
+                  "0 4px 16px rgba(0,80,180,0.38)" /* drop shadow */,
+                  "0 1px 0 rgba(0,0,0,0.18)" /* bottom edge darkening */,
+                  "inset 0 1px 0 rgba(255,255,255,0.28)" /* top highlight */,
+                  "inset 0 -1px 0 rgba(0,0,0,0.15)" /* bottom inner shadow */,
+                ].join(", "),
             transform: pressed
-              ? "scale(0.97) translateY(1px)"
+              ? "scale(0.975) translateY(1px)"
               : "scale(1) translateY(0)",
             transition:
-              "background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease",
-            textShadow: "0 1px 2px rgba(0,0,0,0.30)",
+              "background 0.12s ease, box-shadow 0.12s ease, transform 0.1s ease, padding 0.1s ease",
+            textShadow: "0 1px 3px rgba(0,0,0,0.35)",
             userSelect: "none",
             WebkitTapHighlightColor: "transparent",
+            WebkitFontSmoothing: "antialiased",
           }}
         >
           Login
