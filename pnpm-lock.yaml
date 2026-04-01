@@ -126,7 +126,7 @@ importers:
         specifier: ~1.131.8
         version: 1.131.50(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@zxing/browser':
-        specifier: ^0.1.5
+        specifier: ^0.1.1
         version: 0.1.5(@zxing/library@0.21.3)
       class-variance-authority:
         specifier: ^0.7.0
