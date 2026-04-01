@@ -5,6 +5,7 @@ const rampTrackSplash =
 
 export default function LandingScreen({ onLogin }: { onLogin: () => void }) {
   const [visible, setVisible] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 50);
@@ -13,7 +14,7 @@ export default function LandingScreen({ onLogin }: { onLogin: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-between"
+      className="fixed inset-0"
       style={{
         backgroundImage: `url(${rampTrackSplash})`,
         backgroundSize: "cover",
@@ -21,56 +22,71 @@ export default function LandingScreen({ onLogin }: { onLogin: () => void }) {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Dark overlay for contrast */}
-      <div className="absolute inset-0 bg-black/40" />
-
-      {/* Main content */}
+      {/* Gradient overlay — transparent at top, darker toward bottom */}
       <div
-        className="relative z-10 flex flex-col items-center justify-center flex-1 w-full px-8"
+        className="absolute inset-0"
         style={{
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.60) 100%)",
+        }}
+      />
+
+      {/* Button anchored to bottom quarter */}
+      <div
+        className="absolute inset-x-0 bottom-0 flex flex-col items-center"
+        style={{
+          paddingBottom: "12vh",
           opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(20px)",
-          transition: "opacity 0.6s ease, transform 0.6s ease",
+          transform: visible ? "translateY(0)" : "translateY(24px)",
+          transition: "opacity 0.65s ease, transform 0.65s ease",
         }}
       >
-        <div className="flex flex-col items-center gap-8">
-          {/* Branding */}
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-20 w-20 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center">
-                <div
-                  className="h-9 w-9 rounded-full"
-                  style={{ backgroundColor: "#0078D2" }}
-                />
-              </div>
-            </div>
-            <h1
-              className="text-4xl font-bold tracking-wide drop-shadow-lg"
-              style={{ color: "#0078D2" }}
-            >
-              Ramp Track
-            </h1>
-          </div>
-
-          {/* Login button */}
-          <button
-            type="button"
-            onClick={onLogin}
-            className="mt-4 px-16 py-4 rounded-xl text-white text-lg font-semibold tracking-wide shadow-xl transition-all active:scale-95"
-            style={{
-              backgroundColor: "#0078D2",
-              minWidth: "220px",
-              boxShadow: "0 4px 24px rgba(0,120,210,0.45)",
-            }}
-          >
-            Login
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onLogin}
+          onPointerDown={() => setPressed(true)}
+          onPointerUp={() => setPressed(false)}
+          onPointerLeave={() => setPressed(false)}
+          style={{
+            minWidth: "240px",
+            padding: "16px 48px",
+            borderRadius: "16px",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "18px",
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+            color: "#ffffff",
+            background: pressed
+              ? "linear-gradient(135deg, #005fa3 0%, #0069bb 100%)"
+              : "linear-gradient(135deg, #0090f5 0%, #0078D2 60%, #005fa3 100%)",
+            boxShadow: pressed
+              ? "0 2px 8px rgba(0,0,0,0.35)"
+              : "0 6px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.12) inset",
+            transform: pressed
+              ? "scale(0.97) translateY(1px)"
+              : "scale(1) translateY(0)",
+            transition:
+              "background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease",
+            textShadow: "0 1px 2px rgba(0,0,0,0.30)",
+            userSelect: "none",
+            WebkitTapHighlightColor: "transparent",
+          }}
+        >
+          Login
+        </button>
       </div>
 
       {/* Footer */}
-      <div className="relative z-10 pb-8 text-center text-sm text-white/70 drop-shadow">
-        © Jayson James & Ramp Track Systems
+      <div
+        className="absolute inset-x-0 bottom-0 z-10 pb-4 text-center"
+        style={{
+          fontSize: "11px",
+          color: "rgba(255,255,255,0.55)",
+          letterSpacing: "0.02em",
+        }}
+      >
+        © Jayson James &amp; Ramp Track Systems
       </div>
     </div>
   );
