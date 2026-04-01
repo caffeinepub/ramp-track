@@ -18,7 +18,7 @@ import { useAuth } from "../contexts/AuthContext";
 export default function SignInScreen({
   onLoginSuccess,
 }: { onLoginSuccess?: (roles: string[]) => void }) {
-  const { login, auth } = useAuth();
+  const { login, badgeLogin, auth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -60,16 +60,11 @@ export default function SignInScreen({
     setIsLoggingIn(true);
     setError("");
     try {
-      let username: string;
-      let roles: string[];
-      if (badgeId === "970251" || badgeId === "97025101") {
-        username = "Jayson James";
-        roles = ["admin", "agent"];
-      } else {
-        username = badgeId;
-        roles = ["agent"];
-      }
-      await login({ username, password: badgeId, badge: badgeId });
+      await badgeLogin(badgeId);
+      const roles =
+        badgeId === "970251" || badgeId === "97025101"
+          ? ["admin", "agent"]
+          : ["agent"];
       if (onLoginSuccess) {
         onLoginSuccess(roles);
       }

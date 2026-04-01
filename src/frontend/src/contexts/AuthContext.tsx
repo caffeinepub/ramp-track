@@ -14,6 +14,7 @@ interface AuthContextValue {
     password: string;
     badge: string;
   }) => Promise<void>;
+  badgeLogin: (badgeId: string) => Promise<void>;
   logout: () => void;
   isRefreshing: boolean;
 }
@@ -59,13 +60,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuth(state);
   };
 
+  const badgeLogin = async (badgeId: string) => {
+    let username: string;
+    let roles: string[];
+    if (badgeId === "970251" || badgeId === "97025101") {
+      username = "Jayson James";
+      roles = ["admin", "agent"];
+    } else {
+      username = badgeId;
+      roles = ["agent"];
+    }
+    const state: AuthState = {
+      username,
+      badge: badgeId,
+      roles,
+      loginTime: Date.now(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    setAuth(state);
+  };
+
   const logout = () => {
     localStorage.removeItem(STORAGE_KEY);
     setAuth(null);
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout, isRefreshing: false }}>
+    <AuthContext.Provider
+      value={{ auth, login, badgeLogin, logout, isRefreshing: false }}
+    >
       {children}
     </AuthContext.Provider>
   );
