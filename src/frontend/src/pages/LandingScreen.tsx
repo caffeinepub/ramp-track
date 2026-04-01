@@ -1,7 +1,16 @@
+import { useEffect, useState } from "react";
+
 const rampTrackSplash =
   "/assets/ramptracksplash-019d2e4b-1a18-736f-a7f6-8bff4344c78b.png";
 
 export default function LandingScreen({ onLogin }: { onLogin: () => void }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 50);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <div
       className="fixed inset-0 flex flex-col items-center justify-between"
@@ -16,7 +25,14 @@ export default function LandingScreen({ onLogin }: { onLogin: () => void }) {
       <div className="absolute inset-0 bg-black/40" />
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center justify-center flex-1 w-full px-8">
+      <div
+        className="relative z-10 flex flex-col items-center justify-center flex-1 w-full px-8"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(20px)",
+          transition: "opacity 0.6s ease, transform 0.6s ease",
+        }}
+      >
         <div className="flex flex-col items-center gap-8">
           {/* Branding */}
           <div className="flex flex-col items-center gap-3">
@@ -34,9 +50,6 @@ export default function LandingScreen({ onLogin }: { onLogin: () => void }) {
             >
               Ramp Track
             </h1>
-            <p className="text-white/80 text-base tracking-wider uppercase font-medium drop-shadow">
-              Airport Ground Equipment
-            </p>
           </div>
 
           {/* Login button */}
