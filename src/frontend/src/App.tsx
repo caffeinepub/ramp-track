@@ -35,32 +35,28 @@ function AppContent() {
   const authRef = useRef(auth);
   authRef.current = auth;
 
-  // Splash screen for 1.5s on load, then navigate based on auth state
   useEffect(() => {
     const t = setTimeout(() => {
       const currentAuth = authRef.current;
       if (currentAuth) {
-        // Already logged in — go straight to the appropriate screen
         setView(
           currentAuth.roles?.includes("admin") ? "admin-menu" : "operator-home",
         );
       } else {
-        // New: go to landing screen first, not directly to login
         setView("landing");
       }
     }, 1500);
     return () => clearTimeout(t);
   }, []);
 
-  // Sync view with auth changes after splash
+  // Skip redirect to signin when on splash or landing
   useEffect(() => {
-    if (view === "splash") return;
+    if (view === "splash" || view === "landing") return;
     if (!auth) {
       setView("signin");
     }
   }, [auth, view]);
 
-  // Hash-based navigation
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace("#", "") as View;
@@ -82,7 +78,6 @@ function AppContent() {
 
   if (view === "splash") return <SplashScreen />;
 
-  // Landing screen — shown after splash when user is not authenticated
   if (view === "landing") {
     return <LandingScreen onLogin={() => navigate("signin")} />;
   }
@@ -91,8 +86,6 @@ function AppContent() {
     return (
       <SignInScreen
         onLoginSuccess={() => {
-          // All users go to SignOnScreen — it shows only the relevant
-          // button(s) based on role (agent-only sees only agent button).
           navigate("signon");
         }}
       />
