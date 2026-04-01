@@ -12,8 +12,8 @@
   "dir": "ltr",
   "categories": ["productivity", "business", "utilities"],
   "icons": [
-    { "src": "/assets/AppThumbnail.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/assets/AppThumbnail.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "/assets/appthumbnail-019d2e4b-3994-741a-a838-644e51769b12.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/appthumbnail-019d2e4b-3994-741a-a838-644e51769b12.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ],
   "prefer_related_applications": false
 }
