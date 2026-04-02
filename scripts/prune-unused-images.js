@@ -2,9 +2,9 @@ import { promises as fs } from "fs";
 import path from "path";
 
 const DIST_ASSETS_DIR = "src/frontend/dist/assets";
+const GENERATED_DIR = path.join(DIST_ASSETS_DIR, "generated");
 const DIST_HTML = "src/frontend/dist/index.html";
 const DIST_MANIFEST = "src/frontend/dist/manifest.json";
-const GENERATED_DIR = path.join(DIST_ASSETS_DIR, "generated");
 
 const IMAGE_EXTENSIONS = new Set([
   ".jpg",
@@ -36,6 +36,7 @@ async function getAssetFiles(dir) {
       const fullPath = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
+        // Skip the generated folder itself
         if (entry.name !== "generated") {
           files.push(...(await getAssetFiles(fullPath)));
         }
@@ -159,12 +160,16 @@ async function pruneUnusedImages() {
     `Scanning ${jsCount} JS file(s) and ${cssCount} CSS file(s) for image references...`,
   );
 
-  // Read all JS/CSS content, plus index.html and manifest.json so PWA icons are preserved
+  // Read all JS/CSS content once, reuse for both directories
   const contents = await Promise.all(
     assetFiles.map((file) => fs.readFile(file, "utf-8").catch(() => "")),
   );
+
+  // Also include dist/index.html and dist/manifest.json so icons referenced
+  // only from HTML/manifest are not deleted during the prune step.
   const htmlContent = await fs.readFile(DIST_HTML, "utf-8").catch(() => "");
   const manifestContent = await fs.readFile(DIST_MANIFEST, "utf-8").catch(() => "");
+
   const combinedContent = [...contents, htmlContent, manifestContent].join("\n");
 
   const generated = await pruneImagesInDir(
