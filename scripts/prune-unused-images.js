@@ -36,7 +36,6 @@ async function getAssetFiles(dir) {
       const fullPath = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
-        // Skip the generated folder itself
         if (entry.name !== "generated") {
           files.push(...(await getAssetFiles(fullPath)));
         }
@@ -160,16 +159,12 @@ async function pruneUnusedImages() {
     `Scanning ${jsCount} JS file(s) and ${cssCount} CSS file(s) for image references...`,
   );
 
-  // Read all JS/CSS content
+  // Read all JS/CSS content, plus index.html and manifest.json so PWA icons are preserved
   const contents = await Promise.all(
     assetFiles.map((file) => fs.readFile(file, "utf-8").catch(() => "")),
   );
-
-  // Also scan dist/index.html and dist/manifest.json so that images referenced
-  // only from HTML or the PWA manifest (e.g. PWA icons) are not deleted.
   const htmlContent = await fs.readFile(DIST_HTML, "utf-8").catch(() => "");
   const manifestContent = await fs.readFile(DIST_MANIFEST, "utf-8").catch(() => "");
-
   const combinedContent = [...contents, htmlContent, manifestContent].join("\n");
 
   const generated = await pruneImagesInDir(
