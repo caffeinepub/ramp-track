@@ -13,15 +13,6 @@ import OperatorHomeScreen from "./pages/OperatorHomeScreen";
 import ReportIssueScreen from "./pages/ReportIssueScreen";
 import SignInScreen from "./pages/SignInScreen";
 
-// PWA icon references — keep these so the prune script finds them in compiled JS
-// and does not delete the icon files from the build output.
-const _PWA_ICONS = [
-  "/assets/icon-192x192.png",
-  "/assets/icon-512x512.png",
-  "/assets/icon-512x512-maskable.png",
-];
-void _PWA_ICONS;
-
 type View =
   | "splash"
   | "landing"
