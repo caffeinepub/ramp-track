@@ -43,16 +43,16 @@ function typeFromCategory(
   }
 }
 
-function labelFromId(id: string, type: EquipmentType): string {
+function labelFromType(type: EquipmentType): string {
   switch (type) {
     case "DIESEL_TUG":
-      return `Diesel Tug ${id}`;
+      return "Diesel Tug";
     case "ELECTRIC_TUG":
-      return `Electric Tug ${id}`;
+      return "Electric Tug";
     case "STANDUP_PUSHBACK":
-      return `Standup Pushback ${id}`;
+      return "Standup Pushback";
     case "SITDOWN_PUSHBACK":
-      return `Sitdown Pushback ${id}`;
+      return "Sitdown Pushback";
   }
 }
 
@@ -64,21 +64,34 @@ function buildSeedData(): EquipmentRecord[] {
     return {
       id,
       type,
-      label: labelFromId(id, type),
+      label: labelFromType(type),
       status: "AVAILABLE",
       createdAt: now,
     };
   });
 }
 
+// Pattern to detect old-format labels that included the ID, e.g. "Diesel Tug TV0096"
+const OLD_LABEL_RE =
+  /^(Diesel Tug|Electric Tug|Standup Pushback|Sitdown Pushback) TV\d+$/i;
+
 function load(): EquipmentRecord[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const records: EquipmentRecord[] = JSON.parse(raw);
-      // Ensure all canonical IDs are present; add any that are missing
       const allIds = getAllEquipmentIds();
       let dirty = false;
+
+      // Fix any existing records whose label still contains the ID
+      for (const rec of records) {
+        if (rec.label && OLD_LABEL_RE.test(rec.label)) {
+          rec.label = labelFromType(rec.type);
+          dirty = true;
+        }
+      }
+
+      // Ensure all canonical IDs are present; add any that are missing
       for (const id of allIds) {
         if (!records.find((r) => r.id === id)) {
           const cat = getEquipmentType(id);
@@ -86,13 +99,14 @@ function load(): EquipmentRecord[] {
           records.push({
             id,
             type,
-            label: labelFromId(id, type),
+            label: labelFromType(type),
             status: "AVAILABLE",
             createdAt: Date.now(),
           });
           dirty = true;
         }
       }
+
       if (dirty) localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
       return records;
     }
