@@ -41,9 +41,18 @@ import {
 } from "../lib/equipmentRegistry";
 
 const formatEquipmentType = (type: string): string => {
-  if (type === "ELECTRIC_TUG") return "ELECTRIC TUG";
-  if (type === "TUG") return "TUG";
-  return type.replace("_", " ");
+  switch (type) {
+    case "DIESEL_TUG":
+      return "DIESEL TUG";
+    case "ELECTRIC_TUG":
+      return "ELECTRIC TUG";
+    case "STANDUP_PUSHBACK":
+      return "STANDUP PUSHBACK";
+    case "SITDOWN_PUSHBACK":
+      return "SITDOWN PUSHBACK";
+    default:
+      return type.replace(/_/g, " ");
+  }
 };
 
 export default function ManageEquipmentScreen({
@@ -57,7 +66,7 @@ export default function ManageEquipmentScreen({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [newEquipmentType, setNewEquipmentType] =
-    useState<EquipmentType>("TUG");
+    useState<EquipmentType>("DIESEL_TUG");
   const [newEquipmentId, setNewEquipmentId] = useState("");
   const [newEquipmentLabel, setNewEquipmentLabel] = useState("");
   const [addError, setAddError] = useState("");
@@ -96,7 +105,7 @@ export default function ManageEquipmentScreen({
         return;
       }
       const result = addEquipment({
-        id: newEquipmentId.trim(),
+        id: newEquipmentId.trim().toUpperCase(),
         type: newEquipmentType,
         label: newEquipmentLabel.trim() || undefined,
       });
@@ -104,7 +113,7 @@ export default function ManageEquipmentScreen({
         setAddSuccess(true);
         setNewEquipmentId("");
         setNewEquipmentLabel("");
-        setNewEquipmentType("TUG");
+        setNewEquipmentType("DIESEL_TUG");
         loadEquipment();
         toast.success("Equipment added successfully");
         setTimeout(() => setAddSuccess(false), 3000);
@@ -243,13 +252,13 @@ export default function ManageEquipmentScreen({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="TUG">TUG (Gas/Diesel)</SelectItem>
+                      <SelectItem value="DIESEL_TUG">DIESEL TUG</SelectItem>
                       <SelectItem value="ELECTRIC_TUG">ELECTRIC TUG</SelectItem>
                       <SelectItem value="STANDUP_PUSHBACK">
                         STANDUP PUSHBACK
                       </SelectItem>
-                      <SelectItem value="LAMBO_PUSHBACK">
-                        LAMBO PUSHBACK
+                      <SelectItem value="SITDOWN_PUSHBACK">
+                        SITDOWN PUSHBACK
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -263,7 +272,7 @@ export default function ManageEquipmentScreen({
                     id="eq-id"
                     value={newEquipmentId}
                     onChange={(e) => setNewEquipmentId(e.target.value)}
-                    placeholder="e.g., TUG-001"
+                    placeholder="e.g., TV0637"
                     disabled={isProcessing}
                   />
                 </div>
@@ -276,7 +285,7 @@ export default function ManageEquipmentScreen({
                     id="eq-label"
                     value={newEquipmentLabel}
                     onChange={(e) => setNewEquipmentLabel(e.target.value)}
-                    placeholder="e.g., Main Ramp Tug"
+                    placeholder="e.g., Diesel Tug TV0637"
                     disabled={isProcessing}
                   />
                 </div>
