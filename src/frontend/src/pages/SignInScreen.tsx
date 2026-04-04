@@ -34,20 +34,12 @@ export default function SignInScreen({
     setError("");
     try {
       await login({ username: email, password, badge: email });
-      const USERS = [
-        {
-          username: "operator@demo.com",
-          password: "test123",
-          roles: ["agent"],
-        },
-        { username: "970251", password: "test123", roles: ["admin", "agent"] },
-        { username: "100001", password: "test123", roles: ["agent"] },
-      ];
-      const user = USERS.find(
-        (u) => u.username === email && u.password === password,
-      );
-      if (onLoginSuccess && user) {
-        onLoginSuccess(user.roles);
+      // login() throws on failure; if we reach here, auth succeeded
+      // roles are available from AuthContext after login resolves
+      if (onLoginSuccess) {
+        // We don't have the roles here directly, but App.tsx reads from auth state
+        // Pass empty array — App.tsx ignores the argument and navigates based on auth
+        onLoginSuccess([]);
       }
     } catch (err: unknown) {
       setError((err as Error).message || "Login failed.");
@@ -184,7 +176,7 @@ export default function SignInScreen({
                 Operator: operator@demo.com / test123
               </p>
               <p className="font-mono text-xs mt-1">
-                Management: 970251 / test123
+                Management: 970251 / admin123
               </p>
             </div>
           </CardContent>
