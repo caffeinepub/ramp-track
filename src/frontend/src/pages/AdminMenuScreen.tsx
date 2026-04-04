@@ -14,6 +14,25 @@ import { getAllEquipment } from "../lib/equipmentRegistry";
 
 type FilterType = "ALL" | "AVAILABLE" | "ASSIGNED" | "MAINTENANCE";
 
+function formatUserDisplayName(user: {
+  name?: string;
+  username: string;
+  badge: string;
+}) {
+  const raw = user.name || user.username || user.badge || "";
+  if (!raw) return "";
+  const parts = raw.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    const first = parts[0];
+    const last = parts[parts.length - 1];
+    if (/[a-zA-Z]/.test(first)) {
+      return first;
+    }
+    return `${first.charAt(0).toUpperCase()}. ${last}`;
+  }
+  return raw;
+}
+
 export default function AdminMenuScreen({
   onManageEquipment,
   onViewEquipment,
@@ -25,7 +44,12 @@ export default function AdminMenuScreen({
   onViewEquipment: (id: string) => void;
   onBack: () => void;
   onLogout: () => void;
-  currentUser: { username: string; badge: string; roles: string[] };
+  currentUser: {
+    name?: string;
+    username: string;
+    badge: string;
+    roles: string[];
+  };
 }) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("ALL");
   const equipment = getAllEquipment();
@@ -93,7 +117,7 @@ export default function AdminMenuScreen({
                 Admin Menu
               </h1>
               <p className="text-sm text-muted-foreground">
-                {currentUser.badge} · Management
+                {formatUserDisplayName(currentUser)} · Management
               </p>
             </div>
             <div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ export interface AuthState {
   badge: string;
   roles: string[];
   loginTime: number;
+  name: string;
 }
 
 interface AuthContextValue {
@@ -20,8 +21,24 @@ interface AuthContextValue {
 }
 
 const USERS = [
-  { username: "operator@demo.com", password: "test123", roles: ["agent"] },
-  { username: "970251", password: "test123", roles: ["admin", "agent"] },
+  {
+    username: "operator@demo.com",
+    password: "test123",
+    roles: ["agent"],
+    name: "Demo Agent",
+  },
+  {
+    username: "970251",
+    password: "admin123",
+    roles: ["admin", "agent"],
+    name: "Jayson James",
+  },
+  {
+    username: "100001",
+    password: "test123",
+    roles: ["agent"],
+    name: "Demo Agent",
+  },
 ];
 
 const STORAGE_KEY = "ramptrack_auth_state";
@@ -55,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       badge,
       roles: user.roles,
       loginTime: Date.now(),
+      name: user.name,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     setAuth(state);
@@ -63,18 +81,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const badgeLogin = async (badgeId: string) => {
     let username: string;
     let roles: string[];
+    let name: string;
     if (badgeId === "970251" || badgeId === "97025101") {
       username = "Jayson James";
       roles = ["admin", "agent"];
+      name = "Jayson James";
     } else {
       username = badgeId;
       roles = ["agent"];
+      name = badgeId;
     }
     const state: AuthState = {
       username,
       badge: badgeId,
       roles,
       loginTime: Date.now(),
+      name,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     setAuth(state);

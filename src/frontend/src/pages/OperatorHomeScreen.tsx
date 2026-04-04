@@ -7,6 +7,25 @@ const homescreenBackground =
 const reportIssueIcon =
   "/assets/report_issue_icon_1-019d2e4b-f02c-7337-b904-7ee524c8d431.png";
 
+function formatUserDisplayName(user: {
+  name?: string;
+  username: string;
+  badge: string;
+}) {
+  const raw = user.name || user.username || user.badge || "";
+  if (!raw) return "";
+  const parts = raw.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    const first = parts[0];
+    const last = parts[parts.length - 1];
+    if (/[a-zA-Z]/.test(first)) {
+      return first;
+    }
+    return `${first.charAt(0).toUpperCase()}. ${last}`;
+  }
+  return raw;
+}
+
 export default function OperatorHomeScreen({
   onCheckOut,
   onCheckIn,
@@ -20,7 +39,12 @@ export default function OperatorHomeScreen({
   onReportIssue: () => void;
   onLogout: () => void;
   onBack: () => void;
-  currentUser: { username: string; badge: string; roles: string[] };
+  currentUser: {
+    name?: string;
+    username: string;
+    badge: string;
+    roles: string[];
+  };
 }) {
   return (
     <div
@@ -52,7 +76,7 @@ export default function OperatorHomeScreen({
                   Ramp Track
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  {currentUser.badge} · {currentUser.username}
+                  {formatUserDisplayName(currentUser)}
                 </p>
               </div>
             </div>
