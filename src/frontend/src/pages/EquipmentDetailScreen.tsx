@@ -12,6 +12,7 @@ import {
 import { Label } from "../components/ui/label";
 import { getHistoryForEquipment } from "../lib/equipmentHistory";
 import { findById } from "../lib/equipmentRegistry";
+import { formatOperatorName } from "../lib/formatOperatorName";
 
 const formatEquipmentType = (type: string) =>
   type === "ELECTRIC_TUG"
@@ -130,7 +131,7 @@ export default function EquipmentDetailScreen({
                 <div>
                   <Label style={{ color: "#cbd5f5" }}>Last Operator</Label>
                   <p className="mt-1" style={{ color: "#ffffff" }}>
-                    {equipment.lastOperator}
+                    {formatOperatorName(equipment.lastOperator)}
                   </p>
                 </div>
               )}
@@ -215,7 +216,7 @@ export default function EquipmentDetailScreen({
                       <div className="space-y-1">
                         <p className="text-sm" style={{ color: "#cbd5f5" }}>
                           <span className="font-medium">Operator:</span>{" "}
-                          {ev.operator}
+                          {formatOperatorName(ev.operator)}
                         </p>
                         {ev.location && (
                           <p className="text-sm" style={{ color: "#cbd5f5" }}>

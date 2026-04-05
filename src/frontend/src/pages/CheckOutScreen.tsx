@@ -1,4 +1,4 @@
-import { AlertCircle, ScanLine } from "lucide-react";
+import { AlertCircle, CheckCircle2, ScanLine } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 const homescreenBackground =
@@ -30,11 +30,24 @@ export default function CheckOutScreen({
   const [scannerOpen, setScannerOpen] = useState(false);
   const [locationLabel, setLocationLabel] = useState<string | null>(null);
   const [blockedId, setBlockedId] = useState<string | null>(null);
+  const [successInfo, setSuccessInfo] = useState<{
+    id: string;
+    location: string | null;
+  } | null>(null);
 
   // Auto-open scanner on mount
   useEffect(() => {
     setScannerOpen(true);
   }, []);
+
+  // Auto-navigate back after success
+  useEffect(() => {
+    if (!successInfo) return;
+    const timer = setTimeout(() => {
+      onBack();
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [successInfo, onBack]);
 
   const handleConfirm = async () => {
     if (!selected) return;
@@ -55,8 +68,7 @@ export default function CheckOutScreen({
         checkoutTime: Date.now(),
         location,
       });
-      toast.success(`Checked out ${selected.id} successfully`);
-      onBack();
+      setSuccessInfo({ id: selected.id, location });
     } catch {
       toast.error("Failed to check out equipment");
     } finally {
@@ -119,7 +131,56 @@ export default function CheckOutScreen({
           </div>
         </header>
         <main className="container mx-auto px-4 py-6">
-          {blockedId ? (
+          {successInfo ? (
+            // SUCCESS STATE
+            <Card
+              className="border shadow-2xl"
+              style={{
+                background: "rgba(15,23,42,0.95)",
+                borderColor: "rgba(34,197,94,0.6)",
+                borderRadius: "16px",
+                borderWidth: "2px",
+              }}
+              data-ocid="checkout.success_state"
+            >
+              <CardContent className="flex flex-col items-center justify-center py-12 space-y-6">
+                <div
+                  className="rounded-full p-5"
+                  style={{
+                    background: "rgba(34,197,94,0.15)",
+                    border: "2px solid rgba(34,197,94,0.5)",
+                  }}
+                >
+                  <CheckCircle2
+                    className="h-14 w-14"
+                    style={{ color: "#22c55e" }}
+                  />
+                </div>
+                <div className="text-center space-y-2">
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: "#22c55e" }}
+                  >
+                    Checked Out
+                  </p>
+                  <p className="text-lg font-semibold text-white">
+                    {successInfo.id} checked out successfully
+                  </p>
+                  {successInfo.location && (
+                    <p
+                      className="text-base font-normal"
+                      style={{ color: "#94a3b8" }}
+                    >
+                      Assigned to {successInfo.location}
+                    </p>
+                  )}
+                  <p className="text-sm" style={{ color: "#64748b" }}>
+                    Returning to home screen…
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : blockedId ? (
             // BLOCKED STATE — equipment is not available
             <Card
               className="border shadow-2xl"
