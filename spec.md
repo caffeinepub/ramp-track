@@ -1,49 +1,40 @@
-# Ramp Track — UI Polish Pass
+# Ramp Track
 
 ## Current State
 
-The app is a fully functional PWA for airport ground equipment tracking. It has:
-- A `SignOnScreen` (role selection) showing Agent and Management image buttons at 43% width
-- An `AdminMenuScreen` with stat cards that filter an equipment list below them; filter buttons are plain row buttons with no category/type filter for the equipment type
-- An `OperatorHomeScreen` with three icon-image buttons (Take Equipment, Return Equipment, Report Issue)
-- `ManageEquipmentScreen` with equipment list using a Search input
-- Consistent dark card style (`rgba(15,23,42,0.92)`) across screens
+- `StatusBadge` component already exists in `src/frontend/src/components/StatusBadge.tsx` with correct green/amber/red pill styling for AVAILABLE/ASSIGNED/MAINTENANCE.
+- `StatusBadge` is already imported and used in `AdminMenuScreen.tsx`, `ManageEquipmentScreen.tsx`, `CheckInScreen.tsx`, `CheckOutScreen.tsx`, and `EquipmentDetailScreen.tsx`.
+- `AdminMenuScreen.tsx` has a combined status + type filter system. Equipment list is rendered in a scrollable list with status badges already present.
+- `ManageEquipmentScreen.tsx` has its own search bar (`searchQuery` state + `filteredEquipment`) that searches by id, type, and label, with `StatusBadge` already on each row.
+- No equipment ID search bar exists on `AdminMenuScreen.tsx` — only the status stat squares (click-to-filter) and type segmented control.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Equipment type filter (segmented control / tabs) in `AdminMenuScreen` equipment list section — allowing filtering by Diesel Tug, Electric Tug, Standup Pushback, Sitdown Pushback (in addition to the existing status filter)
-- Active filter highlight state with smooth tab transitions and no layout shifting
+- Equipment ID search bar to `AdminMenuScreen.tsx` above the equipment list, inside the Equipment card section (between the type filter tabs and the list itself).
+  - `useState` for `idSearch` (string)
+  - Placeholder: "Search equipment ID"
+  - Real-time partial match: `eq.id.toUpperCase().includes(idSearch.toUpperCase().trim())`
+  - Combined with existing `statusMatch` and `typeMatch` filters — all three must pass
+  - Styled to match the existing dark card theme: dark background, white placeholder/text, rounded, full-width, mobile-friendly tap target
+  - Search icon (Lucide `Search`) inside the input on the left
+  - Does NOT affect the stat square counts (those still use the full `equipment` array)
 
 ### Modify
-- **SignOnScreen** (`src/frontend/src/components/SignOnScreen.tsx`):
-  - Increase both buttons from `w-[43%]` to match main action button size (at least `w-[60%] max-w-[260px]`, same as OperatorHomeScreen action buttons)
-  - Reduce vertical gap between buttons from `gap-6 md:gap-8` to `gap-4`
-  - Change button alt/aria-label text: "AGENT LOGIN" → "Agent" and "MANAGEMENT / ADMIN LOGIN" → "Management"
-  - Center them vertically and horizontally (already centered, but ensure full vertical centering)
-  - Icons scale proportionally since they are images — width increase handles this
-  - Keep exact same navigation behavior (onClick handlers unchanged)
-
-- **AdminMenuScreen** (`src/frontend/src/pages/AdminMenuScreen.tsx`):
-  - Add a type filter (segmented control using Tabs or styled button group) above or inside the equipment list card
-  - Options: All Types | Diesel Tug | Electric Tug | Standup | Sitdown
-  - The type filter should stack with the existing status filter (status filter = stat cards at top; type filter = new segmented control inside the equipment list card)
-  - Active segment clearly highlighted (blue accent, same as existing active stat card)
-  - Smooth transition when switching tabs (no layout shift)
-  - Filter logic: combine status filter (from stat cards) AND type filter (new control)
-  - Consistent padding/spacing in cards — ensure `CardContent` items have uniform padding
-
-- **General polish across all screens**:
-  - Ensure consistent `p-3` or `p-4` padding in all list item rows
-  - Align icons and text baselines properly
-  - Consistent button `h-12` minimum tap target for all action buttons
-  - Header layout consistent: title + subtitle left, action buttons right, same structure on all screens
+- `AdminMenuScreen.tsx`: add `idSearch` state and update `filteredEquipment` to include ID partial match alongside existing status + type filters.
+- No other files need changes — `StatusBadge` is already applied everywhere status appears.
 
 ### Remove
-- Nothing to remove
+- Nothing.
 
 ## Implementation Plan
 
-1. **SignOnScreen.tsx** — bump button width to `w-[60%] max-w-[260px]`, reduce gap to `gap-4`, update aria-labels to "Agent" and "Management"
-2. **AdminMenuScreen.tsx** — add `typeFilter` state (`ALL | DIESEL_TUG | ELECTRIC_TUG | STANDUP_PUSHBACK | SITDOWN_PUSHBACK`), add segmented control UI inside the equipment list card header, filter `filteredEquipment` by both status and type, highlight active type segment with blue border/background
-3. **General** — audit padding, spacing, and button height for consistency across `AdminMenuScreen`, `ManageEquipmentScreen`, and `OperatorHomeScreen`; no color or branding changes
+1. In `AdminMenuScreen.tsx`:
+   - Add `import { Search } from "lucide-react"` (already has other imports from lucide; check if Search is already imported — it is not).
+   - Add `import { Input } from "../components/ui/input"`.
+   - Add `const [idSearch, setIdSearch] = useState("")` alongside existing filter states.
+   - Update `filteredEquipment` filter to add: `&& (idSearch.trim() === "" || eq.id.toUpperCase().includes(idSearch.trim().toUpperCase()))`.
+   - Add search input UI inside the Equipment card `CardHeader`, below the type filter tabs row.
+   - Style: `relative` wrapper div, `Search` icon absolutely positioned left, `Input` with `pl-10`, dark background matching the card, white text, rounded-lg, full width.
+   - Stat square counts remain using the unfiltered `equipment` array — no change there.
+2. Validate (typecheck + build).

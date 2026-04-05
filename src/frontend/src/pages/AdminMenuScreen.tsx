@@ -1,6 +1,7 @@
 import { useState } from "react";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
+import { Search } from "lucide-react";
 import { StatusBadge } from "../components/StatusBadge";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -10,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import { Input } from "../components/ui/input";
 import { getAllEvents } from "../lib/equipmentHistory";
 import { getAllEquipment } from "../lib/equipmentRegistry";
 import type { EquipmentType } from "../lib/equipmentRegistry";
@@ -64,6 +66,7 @@ export default function AdminMenuScreen({
 }) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("ALL");
   const [typeFilter, setTypeFilter] = useState<TypeFilterType>("ALL");
+  const [idSearch, setIdSearch] = useState("");
   const equipment = getAllEquipment();
   const events = getAllEvents().slice(0, 10);
   const available = equipment.filter((e) => e.status === "AVAILABLE").length;
@@ -75,7 +78,10 @@ export default function AdminMenuScreen({
   const filteredEquipment = equipment.filter((e) => {
     const statusMatch = activeFilter === "ALL" || e.status === activeFilter;
     const typeMatch = typeFilter === "ALL" || e.type === typeFilter;
-    return statusMatch && typeMatch;
+    const idMatch =
+      idSearch.trim() === "" ||
+      e.id.toUpperCase().includes(idSearch.trim().toUpperCase());
+    return statusMatch && typeMatch && idMatch;
   });
 
   const stats: {
@@ -266,6 +272,25 @@ export default function AdminMenuScreen({
                     </button>
                   ))}
                 </div>
+              </div>
+              {/* Equipment ID search */}
+              <div className="relative mt-3">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+                  style={{ color: "#94a3b8" }}
+                />
+                <Input
+                  data-ocid="admin.equipment.search_input"
+                  value={idSearch}
+                  onChange={(e) => setIdSearch(e.target.value)}
+                  placeholder="Search equipment ID"
+                  className="pl-10"
+                  style={{
+                    background: "rgba(30,41,59,0.6)",
+                    borderColor: "rgba(255,255,255,0.15)",
+                    color: "#ffffff",
+                  }}
+                />
               </div>
             </CardHeader>
             <CardContent>
