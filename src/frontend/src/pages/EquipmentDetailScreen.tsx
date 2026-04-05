@@ -1,5 +1,6 @@
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
+import { StatusBadge } from "../components/StatusBadge";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -70,13 +71,6 @@ export default function EquipmentDetailScreen({
     );
   }
 
-  const statusVariant = (s: string) =>
-    s === "AVAILABLE"
-      ? "default"
-      : s === "ASSIGNED"
-        ? "secondary"
-        : "destructive";
-
   return (
     <div className="min-h-screen relative" style={bg}>
       <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/40 to-black/30 backdrop-blur-[1px]" />
@@ -105,9 +99,7 @@ export default function EquipmentDetailScreen({
                 <CardTitle style={{ color: "#ffffff" }}>
                   {equipment.id}
                 </CardTitle>
-                <Badge variant={statusVariant(equipment.status)}>
-                  {equipment.status}
-                </Badge>
+                <StatusBadge status={equipment.status} />
               </div>
             </CardHeader>
             <CardContent className="space-y-3">

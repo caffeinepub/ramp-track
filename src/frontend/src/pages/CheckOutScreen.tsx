@@ -4,6 +4,7 @@ import { toast } from "sonner";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
 import BarcodeScanner from "../components/BarcodeScanner";
+import { StatusBadge } from "../components/StatusBadge";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -197,9 +198,7 @@ export default function CheckOutScreen({
                       {selected.label}
                     </p>
                   )}
-                  <Badge variant="default" className="mt-2">
-                    AVAILABLE
-                  </Badge>
+                  <StatusBadge status="AVAILABLE" className="mt-2" />
                 </div>
                 <p style={{ color: "#cbd5f5" }}>
                   Operator:{" "}

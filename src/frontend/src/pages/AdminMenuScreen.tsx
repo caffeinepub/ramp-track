@@ -1,6 +1,7 @@
 import { useState } from "react";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
+import { StatusBadge } from "../components/StatusBadge";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -312,17 +313,7 @@ export default function AdminMenuScreen({
                           </p>
                         )}
                       </div>
-                      <Badge
-                        variant={
-                          eq.status === "AVAILABLE"
-                            ? "default"
-                            : eq.status === "ASSIGNED"
-                              ? "secondary"
-                              : "destructive"
-                        }
-                      >
-                        {eq.status}
-                      </Badge>
+                      <StatusBadge status={eq.status} />
                     </button>
                   ))
                 )}

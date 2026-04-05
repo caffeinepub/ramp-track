@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
+import { StatusBadge } from "../components/StatusBadge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -166,13 +167,6 @@ export default function ManageEquipmentScreen({
       setIsProcessing(false);
     }
   };
-
-  const statusVariant = (s: EquipmentStatus) =>
-    s === "AVAILABLE"
-      ? "default"
-      : s === "ASSIGNED"
-        ? "secondary"
-        : "destructive";
 
   return (
     <div
@@ -398,9 +392,7 @@ export default function ManageEquipmentScreen({
                           Added: {new Date(eq.createdAt).toLocaleDateString()}
                         </p>
                       </div>
-                      <Badge variant={statusVariant(eq.status)}>
-                        {eq.status}
-                      </Badge>
+                      <StatusBadge status={eq.status} />
                     </button>
                   ))}
                 </div>

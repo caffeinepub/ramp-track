@@ -4,6 +4,7 @@ import { toast } from "sonner";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
 import BarcodeScanner from "../components/BarcodeScanner";
+import { StatusBadge } from "../components/StatusBadge";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -144,9 +145,7 @@ export default function CheckInScreen({
                       Last operator: {selected.lastOperator}
                     </p>
                   )}
-                  <Badge variant="secondary" className="mt-2">
-                    ASSIGNED
-                  </Badge>
+                  <StatusBadge status="ASSIGNED" className="mt-2" />
                 </div>
                 <p style={{ color: "#cbd5f5" }}>
                   Returning as:{" "}
