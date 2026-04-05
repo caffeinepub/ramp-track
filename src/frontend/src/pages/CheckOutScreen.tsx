@@ -1,4 +1,4 @@
-import { ScanLine } from "lucide-react";
+import { AlertCircle, ScanLine } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 const homescreenBackground =
@@ -28,6 +28,7 @@ export default function CheckOutScreen({
   const [isProcessing, setIsProcessing] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [locationLabel, setLocationLabel] = useState<string | null>(null);
+  const [blockedId, setBlockedId] = useState<string | null>(null);
 
   // Auto-open scanner on mount
   useEffect(() => {
@@ -65,13 +66,18 @@ export default function CheckOutScreen({
   const handleScanResult = (id: string) => {
     setScannerOpen(false);
     const eq = findById(id);
-    if (eq && eq.status === "AVAILABLE") {
-      setSelected(eq);
-    } else if (eq) {
-      toast.error(`${id} is not available (status: ${eq.status})`);
-    } else {
+    if (!eq) {
       toast.error(`Equipment ${id} not found in registry`);
+      return;
     }
+    if (eq.status !== "AVAILABLE") {
+      // Block checkout — show blocked state, no override allowed
+      setBlockedId(id);
+      setSelected(null);
+      return;
+    }
+    setBlockedId(null);
+    setSelected(eq);
   };
 
   return (
@@ -112,7 +118,58 @@ export default function CheckOutScreen({
           </div>
         </header>
         <main className="container mx-auto px-4 py-6">
-          {selected ? (
+          {blockedId ? (
+            // BLOCKED STATE — equipment is not available
+            <Card
+              className="border shadow-2xl"
+              style={{
+                background: "rgba(15,23,42,0.95)",
+                borderColor: "rgba(239,68,68,0.6)",
+                borderRadius: "16px",
+                borderWidth: "2px",
+              }}
+            >
+              <CardContent className="flex flex-col items-center justify-center py-12 space-y-6">
+                <div
+                  className="rounded-full p-5"
+                  style={{
+                    background: "rgba(239,68,68,0.15)",
+                    border: "2px solid rgba(239,68,68,0.5)",
+                  }}
+                >
+                  <AlertCircle
+                    className="h-12 w-12"
+                    style={{ color: "#ef4444" }}
+                  />
+                </div>
+                <div className="text-center space-y-2">
+                  <p
+                    className="text-2xl font-bold"
+                    style={{ color: "#ef4444" }}
+                  >
+                    Cannot Check Out
+                  </p>
+                  <p className="text-lg font-semibold text-white">
+                    This equipment is already checked out
+                  </p>
+                  <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>
+                    {blockedId}
+                  </p>
+                </div>
+                <Button
+                  onClick={() => {
+                    setBlockedId(null);
+                    setScannerOpen(true);
+                  }}
+                  className="bg-blue-700 hover:bg-blue-600 px-8 py-3 text-lg w-full max-w-xs"
+                  data-ocid="checkout.scan-again.button"
+                >
+                  <ScanLine className="h-5 w-5 mr-2" />
+                  Scan Different Equipment
+                </Button>
+              </CardContent>
+            </Card>
+          ) : selected ? (
             <Card
               className="border shadow-2xl"
               style={{
