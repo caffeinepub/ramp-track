@@ -11,8 +11,10 @@ import {
 } from "../components/ui/card";
 import { getAllEvents } from "../lib/equipmentHistory";
 import { getAllEquipment } from "../lib/equipmentRegistry";
+import type { EquipmentType } from "../lib/equipmentRegistry";
 
 type FilterType = "ALL" | "AVAILABLE" | "ASSIGNED" | "MAINTENANCE";
+type TypeFilterType = "ALL" | EquipmentType;
 
 function formatUserDisplayName(user: {
   name?: string;
@@ -33,6 +35,14 @@ function formatUserDisplayName(user: {
   return raw;
 }
 
+const TYPE_FILTERS: { label: string; value: TypeFilterType }[] = [
+  { label: "All Types", value: "ALL" },
+  { label: "Diesel", value: "DIESEL_TUG" },
+  { label: "Electric", value: "ELECTRIC_TUG" },
+  { label: "Standup", value: "STANDUP_PUSHBACK" },
+  { label: "Sitdown", value: "SITDOWN_PUSHBACK" },
+];
+
 export default function AdminMenuScreen({
   onManageEquipment,
   onViewEquipment,
@@ -52,6 +62,7 @@ export default function AdminMenuScreen({
   };
 }) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("ALL");
+  const [typeFilter, setTypeFilter] = useState<TypeFilterType>("ALL");
   const equipment = getAllEquipment();
   const events = getAllEvents().slice(0, 10);
   const available = equipment.filter((e) => e.status === "AVAILABLE").length;
@@ -60,10 +71,11 @@ export default function AdminMenuScreen({
     (e) => e.status === "MAINTENANCE",
   ).length;
 
-  const filteredEquipment =
-    activeFilter === "ALL"
-      ? equipment
-      : equipment.filter((e) => e.status === activeFilter);
+  const filteredEquipment = equipment.filter((e) => {
+    const statusMatch = activeFilter === "ALL" || e.status === activeFilter;
+    const typeMatch = typeFilter === "ALL" || e.type === typeFilter;
+    return statusMatch && typeMatch;
+  });
 
   const stats: {
     label: string;
@@ -117,7 +129,7 @@ export default function AdminMenuScreen({
                 Admin Menu
               </h1>
               <p className="text-sm text-muted-foreground">
-                {formatUserDisplayName(currentUser)} · Management
+                {formatUserDisplayName(currentUser)} &middot; Management
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -126,7 +138,7 @@ export default function AdminMenuScreen({
                 onClick={onBack}
                 data-ocid="admin.back.button"
               >
-                ← Back
+                &larr; Back
               </Button>
               <Button
                 variant="outline"
@@ -187,7 +199,7 @@ export default function AdminMenuScreen({
                 className="h-16 text-lg bg-blue-700 hover:bg-blue-600"
                 onClick={onManageEquipment}
               >
-                🔧 Manage Equipment
+                &#128295; Manage Equipment
               </Button>
               <Button
                 data-ocid="admin.view_all.button"
@@ -195,7 +207,7 @@ export default function AdminMenuScreen({
                 className="h-16 text-lg"
                 onClick={() => equipment[0] && onViewEquipment(equipment[0].id)}
               >
-                📋 View Equipment Details
+                &#128203; View Equipment Details
               </Button>
             </CardContent>
           </Card>
@@ -207,7 +219,7 @@ export default function AdminMenuScreen({
               borderRadius: "16px",
             }}
           >
-            <CardHeader>
+            <CardHeader className="pb-3">
               <CardTitle style={{ color: "#ffffff" }}>
                 {activeFilter === "ALL"
                   ? "All Equipment"
@@ -219,19 +231,59 @@ export default function AdminMenuScreen({
                   ({filteredEquipment.length})
                 </span>
               </CardTitle>
+              {/* Type filter segmented control */}
+              <div
+                className="overflow-x-auto mt-3"
+                style={{ WebkitOverflowScrolling: "touch" }}
+              >
+                <div className="flex flex-nowrap gap-2 pb-1">
+                  {TYPE_FILTERS.map((tf) => (
+                    <button
+                      key={tf.value}
+                      type="button"
+                      onClick={() => setTypeFilter(tf.value)}
+                      data-ocid={`admin.type_filter.${tf.value.toLowerCase()}.tab`}
+                      className="flex-shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all"
+                      style={{
+                        background:
+                          typeFilter === tf.value
+                            ? "rgba(0,120,210,0.25)"
+                            : "rgba(30,41,59,0.6)",
+                        borderColor:
+                          typeFilter === tf.value
+                            ? "#0078D2"
+                            : "rgba(255,255,255,0.15)",
+                        color: typeFilter === tf.value ? "#60b4ff" : "#94a3b8",
+                        boxShadow:
+                          typeFilter === tf.value
+                            ? "0 0 0 1px #0078D2"
+                            : undefined,
+                        minHeight: "36px",
+                      }}
+                    >
+                      {tf.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {filteredEquipment.length === 0 ? (
-                  <p className="text-center py-4" style={{ color: "#94a3b8" }}>
+                  <p
+                    className="text-center py-4"
+                    style={{ color: "#94a3b8" }}
+                    data-ocid="admin.equipment.empty_state"
+                  >
                     No equipment in this category.
                   </p>
                 ) : (
-                  filteredEquipment.map((eq) => (
+                  filteredEquipment.map((eq, i) => (
                     <button
                       key={eq.id}
                       type="button"
                       onClick={() => onViewEquipment(eq.id)}
+                      data-ocid={`admin.equipment.item.${i + 1}`}
                       className="w-full text-left flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
                       style={{
                         background: "rgba(30,41,59,0.5)",
@@ -250,12 +302,13 @@ export default function AdminMenuScreen({
                             className="text-xs mt-0.5"
                             style={{ color: "#94a3b8" }}
                           >
-                            📍 {eq.location}
+                            &#128205; {eq.location}
                           </p>
                         )}
                         {eq.status === "ASSIGNED" && eq.checkoutTime && (
                           <p className="text-xs" style={{ color: "#94a3b8" }}>
-                            🕐 {new Date(eq.checkoutTime).toLocaleTimeString()}
+                            &#128336;{" "}
+                            {new Date(eq.checkoutTime).toLocaleTimeString()}
                           </p>
                         )}
                       </div>
@@ -322,7 +375,7 @@ export default function AdminMenuScreen({
                             className="text-xs mt-0.5"
                             style={{ color: "#94a3b8" }}
                           >
-                            📍 {ev.location}
+                            &#128205; {ev.location}
                           </p>
                         )}
                         {ev.notes && (

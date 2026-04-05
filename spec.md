@@ -1,49 +1,49 @@
-# Ramp Track
+# Ramp Track — UI Polish Pass
 
 ## Current State
-- All screens use ES module imports from `src/assets/` for images (corrupted files)
-- No barcode scanner component exists; ZXing type declarations are present but unused
-- ZXing is not installed as an npm package; it was intended to load from CDN (never wired up in index.html)
-- CheckOutScreen and CheckInScreen use text search/list only — no scan capability
-- SignInScreen uses manual email/password only — no badge scan capability
+
+The app is a fully functional PWA for airport ground equipment tracking. It has:
+- A `SignOnScreen` (role selection) showing Agent and Management image buttons at 43% width
+- An `AdminMenuScreen` with stat cards that filter an equipment list below them; filter buttons are plain row buttons with no category/type filter for the equipment type
+- An `OperatorHomeScreen` with three icon-image buttons (Take Equipment, Return Equipment, Report Issue)
+- `ManageEquipmentScreen` with equipment list using a Search input
+- Consistent dark card style (`rgba(15,23,42,0.92)`) across screens
 
 ## Requested Changes (Diff)
 
 ### Add
-- Install `@zxing/browser` as a local npm dependency
-- Create `src/components/BarcodeScanner.tsx`: a reusable camera scanner component using `BrowserMultiFormatReader`. Supports QR, Code 39, Code 128, PDF417. Props: `onResult(text: string)`, `onClose()`, `mode: 'equipment' | 'badge'`. Equipment mode normalizes result to TV#### pattern. Badge mode extracts longest digit sequence (min 4 digits, preserve leading zeros). Shows live camera feed with orange guide line overlay, flashlight toggle (if supported), close button, beep + vibration on successful scan. Mounts once per open — no flicker/strobe.
-- Add a "Scan" button to CheckOutScreen that opens BarcodeScanner in equipment mode; on result, auto-selects matching equipment from registry
-- Add a "Scan" button to CheckInScreen that opens BarcodeScanner in equipment mode; on result, auto-selects matching equipment from the assigned list
-- Add a "Scan Badge" button to SignInScreen that opens BarcodeScanner in badge mode; on result, logs in using the extracted badge ID (manager IDs 970251 or 97025101 → Jayson James admin)
+- Equipment type filter (segmented control / tabs) in `AdminMenuScreen` equipment list section — allowing filtering by Diesel Tug, Electric Tug, Standup Pushback, Sitdown Pushback (in addition to the existing status filter)
+- Active filter highlight state with smooth tab transitions and no layout shifting
 
 ### Modify
-- Fix all corrupted image imports across all affected files. Replace `import X from '../assets/CorruptName.ext'` with `const X = '/assets/uuid-hashed-name.ext'` using the valid public/assets paths:
-  - `HomescreenBackground.jpg` → `/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg`
-  - `RampTrackSplash.png` → `/assets/ramptracksplash-019d2e4b-1a18-736f-a7f6-8bff4344c78b.png`
-  - `AgentLogin.png` → `/assets/agentlogin-019d2e49-69e7-73fe-8172-a52b87efe1eb.png`
-  - `managementlogin.png` → `/assets/managementlogin-019d2e4a-4e21-770e-83b4-0b2873150efd.png`
-  - `SignInBackgroundLower.jpg` → `/assets/signinbackgroundlower-019d2e4a-fc0d-77ac-8d6b-f27f72365149.jpg`
-  - `Check_In_Icon-1.png` → `/assets/check_in_icon_1-019d2e4b-73cd-7298-b378-ab34d052c7fb.png`
-  - `Check_In_Icon.png` → `/assets/check_in_icon-019d2e4b-5850-75df-9b7a-e58a9e501c74.png`
-  - `Check_Out_Icon-1.png` → `/assets/check_out_icon_1-019d2e4b-c156-70c4-b1de-80233dcf357f.png`
-  - `Check_Out_Icon.png` → `/assets/check_out_icon-019d2e4b-a3ef-74f2-9425-22733372de39.png`
-  - `Report_Issue_Icon-1.png` → `/assets/report_issue_icon_1-019d2e4b-f02c-7337-b904-7ee524c8d431.png`
-  - `Report_Issue_Icon.png` → `/assets/report_issue_icon-019d2e4b-d8f6-7414-9a69-5f566e7113a9.png`
-- Update `zxing.d.ts` to remove the global Window declaration (no longer needed since ZXing is a local import)
+- **SignOnScreen** (`src/frontend/src/components/SignOnScreen.tsx`):
+  - Increase both buttons from `w-[43%]` to match main action button size (at least `w-[60%] max-w-[260px]`, same as OperatorHomeScreen action buttons)
+  - Reduce vertical gap between buttons from `gap-6 md:gap-8` to `gap-4`
+  - Change button alt/aria-label text: "AGENT LOGIN" → "Agent" and "MANAGEMENT / ADMIN LOGIN" → "Management"
+  - Center them vertically and horizontally (already centered, but ensure full vertical centering)
+  - Icons scale proportionally since they are images — width increase handles this
+  - Keep exact same navigation behavior (onClick handlers unchanged)
+
+- **AdminMenuScreen** (`src/frontend/src/pages/AdminMenuScreen.tsx`):
+  - Add a type filter (segmented control using Tabs or styled button group) above or inside the equipment list card
+  - Options: All Types | Diesel Tug | Electric Tug | Standup | Sitdown
+  - The type filter should stack with the existing status filter (status filter = stat cards at top; type filter = new segmented control inside the equipment list card)
+  - Active segment clearly highlighted (blue accent, same as existing active stat card)
+  - Smooth transition when switching tabs (no layout shift)
+  - Filter logic: combine status filter (from stat cards) AND type filter (new control)
+  - Consistent padding/spacing in cards — ensure `CardContent` items have uniform padding
+
+- **General polish across all screens**:
+  - Ensure consistent `p-3` or `p-4` padding in all list item rows
+  - Align icons and text baselines properly
+  - Consistent button `h-12` minimum tap target for all action buttons
+  - Header layout consistent: title + subtitle left, action buttons right, same structure on all screens
 
 ### Remove
-- Nothing
+- Nothing to remove
 
 ## Implementation Plan
-1. Run `pnpm add @zxing/browser` in `src/frontend/`
-2. Create `src/frontend/src/components/BarcodeScanner.tsx`
-3. Update `CheckOutScreen.tsx`: fix image import + add Scan button that opens BarcodeScanner
-4. Update `CheckInScreen.tsx`: fix image import + add Scan button that opens BarcodeScanner
-5. Update `SignInScreen.tsx`: fix image import + add Scan Badge button
-6. Update `OperatorHomeScreen.tsx`: fix all 4 image imports
-7. Update `SignOnScreen.tsx`: fix all 3 image imports
-8. Update `SplashScreen.tsx`: fix image import
-9. Update `ErrorBoundary.tsx`: fix image import
-10. Update `AdminMenuScreen.tsx`, `ManageEquipmentScreen.tsx`, `ReportIssueScreen.tsx`, `EquipmentDetailScreen.tsx`: fix image imports
-11. Update `zxing.d.ts` to remove CDN global declaration
-12. Validate build
+
+1. **SignOnScreen.tsx** — bump button width to `w-[60%] max-w-[260px]`, reduce gap to `gap-4`, update aria-labels to "Agent" and "Management"
+2. **AdminMenuScreen.tsx** — add `typeFilter` state (`ALL | DIESEL_TUG | ELECTRIC_TUG | STANDUP_PUSHBACK | SITDOWN_PUSHBACK`), add segmented control UI inside the equipment list card header, filter `filteredEquipment` by both status and type, highlight active type segment with blue border/background
+3. **General** — audit padding, spacing, and button height for consistency across `AdminMenuScreen`, `ManageEquipmentScreen`, and `OperatorHomeScreen`; no color or branding changes
