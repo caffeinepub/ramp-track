@@ -3,6 +3,8 @@ import path from "path";
 
 const DIST_ASSETS_DIR = "src/frontend/dist/assets";
 const GENERATED_DIR = path.join(DIST_ASSETS_DIR, "generated");
+const DIST_HTML = "src/frontend/dist/index.html";
+const DIST_MANIFEST = "src/frontend/dist/manifest.json";
 
 const IMAGE_EXTENSIONS = new Set([
   ".jpg",
@@ -75,7 +77,6 @@ async function getImagesInDir(dir) {
 
   return images;
 }
-
 
 async function pruneImagesInDir(dir, label, combinedContent) {
   const images = await getImagesInDir(dir);
@@ -163,7 +164,17 @@ async function pruneUnusedImages() {
   const contents = await Promise.all(
     assetFiles.map((file) => fs.readFile(file, "utf-8").catch(() => "")),
   );
-  const combinedContent = contents.join("\n");
+
+  // Also include dist/index.html and dist/manifest.json so icons referenced
+  // only from HTML/manifest are not deleted during the prune step.
+  const htmlContent = await fs.readFile(DIST_HTML, "utf-8").catch(() => "");
+  const manifestContent = await fs
+    .readFile(DIST_MANIFEST, "utf-8")
+    .catch(() => "");
+
+  const combinedContent = [...contents, htmlContent, manifestContent].join(
+    "\n",
+  );
 
   const generated = await pruneImagesInDir(
     GENERATED_DIR,
