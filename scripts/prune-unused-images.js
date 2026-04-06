@@ -168,13 +168,9 @@ async function pruneUnusedImages() {
   // Also include dist/index.html and dist/manifest.json so icons referenced
   // only from HTML/manifest are not deleted during the prune step.
   const htmlContent = await fs.readFile(DIST_HTML, "utf-8").catch(() => "");
-  const manifestContent = await fs
-    .readFile(DIST_MANIFEST, "utf-8")
-    .catch(() => "");
+  const manifestContent = await fs.readFile(DIST_MANIFEST, "utf-8").catch(() => "");
 
-  const combinedContent = [...contents, htmlContent, manifestContent].join(
-    "\n",
-  );
+  const combinedContent = [...contents, htmlContent, manifestContent].join("\n");
 
   const generated = await pruneImagesInDir(
     GENERATED_DIR,
