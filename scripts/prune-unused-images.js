@@ -160,7 +160,7 @@ async function pruneUnusedImages() {
     `Scanning ${jsCount} JS file(s) and ${cssCount} CSS file(s) for image references...`,
   );
 
-  // Read all JS/CSS content once, reuse for both directories
+  // Read all JS/CSS content
   const contents = await Promise.all(
     assetFiles.map((file) => fs.readFile(file, "utf-8").catch(() => "")),
   );
