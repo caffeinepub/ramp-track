@@ -1,11 +1,8 @@
-const checkInIcon =
-  "/assets/check_in_icon_1-019d2e4b-73cd-7298-b378-ab34d052c7fb.png";
-const checkOutIcon =
-  "/assets/check_out_icon_1-019d2e4b-c156-70c4-b1de-80233dcf357f.png";
+const checkInIcon = "/assets/Check_In_Icon.png";
+const checkOutIcon = "/assets/Check_Out_Icon.png";
 const homescreenBackground =
   "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
-const reportIssueIcon =
-  "/assets/report_issue_icon_1-019d2e4b-f02c-7337-b904-7ee524c8d431.png";
+const reportIssueIcon = "/assets/Report_Issue_Icon.png";
 
 function formatUserDisplayName(user: {
   name?: string;
