@@ -1,8 +1,6 @@
-const checkInIcon = "/assets/Check_In_Icon.png";
-const checkOutIcon = "/assets/Check_Out_Icon.png";
-const homescreenBackground =
-  "/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg";
-const reportIssueIcon = "/assets/Report_Issue_Icon.png";
+import checkInIcon from "../assets/Check_In_Icon.png";
+import checkOutIcon from "../assets/Check_Out_Icon.png";
+import reportIssueIcon from "../assets/Report_Issue_Icon.png";
 
 function formatUserDisplayName(user: {
   name?: string;
@@ -47,7 +45,8 @@ export default function OperatorHomeScreen({
     <div
       className="min-h-screen relative"
       style={{
-        backgroundImage: `url(${homescreenBackground})`,
+        backgroundImage:
+          "url(/assets/homescreenbackground-019d2e4a-c901-72bd-837b-8409f84ded93.jpg)",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -97,6 +96,7 @@ export default function OperatorHomeScreen({
             </p>
           </div>
           <div className="flex flex-col items-center gap-5 w-full max-w-sm">
+            {/* Take Equipment */}
             <button
               type="button"
               data-ocid="home.checkout.button"
@@ -110,6 +110,7 @@ export default function OperatorHomeScreen({
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
             </button>
+            {/* Return Equipment */}
             <button
               type="button"
               data-ocid="home.checkin.button"
@@ -123,6 +124,7 @@ export default function OperatorHomeScreen({
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
             </button>
+            {/* Report Issue */}
             <button
               type="button"
               data-ocid="home.reportissue.button"

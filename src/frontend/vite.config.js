@@ -18,6 +18,10 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: false,
     minify: false,
+    // Prevent PNG icons from being inlined as base64 data: URLs.
+    // Files in public/ are never processed by Vite anyway, but this
+    // ensures any PNG referenced from src/ is also kept as a file.
+    assetsInlineLimit: 0,
   },
   css: {
     postcss: "./postcss.config.js",
